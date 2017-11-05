@@ -66,6 +66,9 @@ class MouseComponent(view: View) : Component(view) {
 		addEventListener<MouseClickEvent> { e ->
 			if (isOver) {
 				onClick(this)
+				onClick.listenerCount > 0
+			} else {
+				false
 			}
 			/*
 			upPos.copyFrom(input.mouse)
@@ -85,12 +88,15 @@ class MouseComponent(view: View) : Component(view) {
 				//	onClick(this)
 				//}
 			}
+			false
 		}
 		addEventListener<MouseDownEvent> { e ->
 			downPos.copyFrom(input.mouse)
+			false
 		}
 		addEventListener<MouseMovedEvent> { e ->
 			//println(e)
+			false
 		}
 	}
 

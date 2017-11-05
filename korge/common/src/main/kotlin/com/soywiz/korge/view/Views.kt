@@ -2,6 +2,7 @@ package com.soywiz.korge.view
 
 import com.soywiz.korag.AG
 import com.soywiz.korag.log.LogAG
+import com.soywiz.korge.PreventDefaultException
 import com.soywiz.korge.audio.SoundSystem
 import com.soywiz.korge.audio.soundSystem
 import com.soywiz.korge.bitmapfont.BitmapFont
@@ -105,8 +106,12 @@ class Views(
 		for (plugin in plugins.plugins) plugin.register(this)
 	}
 
-	override fun <T : Any> dispatch(event: T, clazz: KClass<out T>) {
-		this.stage.dispatch(event, clazz)
+	override fun <T : Any> dispatch(event: T, clazz: KClass<out T>): Boolean {
+		try {
+			return this.stage.dispatch(event, clazz)
+		} catch (e: PreventDefaultException) {
+			return true
+		}
 	}
 
 	private val resizedEvent = StageResizedEvent(0, 0)

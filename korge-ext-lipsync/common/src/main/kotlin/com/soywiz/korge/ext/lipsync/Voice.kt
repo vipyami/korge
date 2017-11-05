@@ -101,6 +101,7 @@ class LipSyncComponent(view: View) : Component(view) {
 			if (it.name == name) {
 				view.play("${it.lip}")
 			}
+			false
 		}
 	}
 }

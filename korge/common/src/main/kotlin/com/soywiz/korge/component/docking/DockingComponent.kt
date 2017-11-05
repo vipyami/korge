@@ -15,6 +15,7 @@ class DockingComponent(view: View, var anchor: Anchor) : Component(view) {
 			view.y = views.actualVirtualTop.toDouble() + (views.actualVirtualHeight) * anchor.sy
 			view.invalidate()
 			view.parent?.invalidate()
+			false
 		}
 	}
 }

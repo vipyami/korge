@@ -303,3 +303,5 @@ object Korge {
 
 	data class ModuleArgs(val args: Array<String>)
 }
+
+class PreventDefaultException : Exception()

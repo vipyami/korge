@@ -85,11 +85,15 @@ open class Container(views: Views) : View(views) {
 		//for (child in children.toList()) child.update(dtMs)
 	}
 
-	override fun <T : Any> dispatch(event: T, clazz: KClass<out T>) {
+	override fun <T : Any> dispatch(event: T, clazz: KClass<out T>): Boolean {
 		super.dispatch(event, clazz)
-		safeForEachChildren { child ->
-			child.dispatch(event, clazz)
+		var n = 0
+		while (n < children.size) {
+			val child = children[n]
+			if (child.dispatch(event, clazz)) return true
+			n++
 		}
+		return false
 	}
 
 	inline protected fun safeForEachChildren(crossinline callback: (View) -> Unit) {

@@ -13,9 +13,21 @@ class KeysComponent(view: View) : Component(view) {
 	val onKeyTyped = AsyncSignal<KeyTypedEvent>()
 
 	init {
-		this.detatchCancellables += view.addEventListener<KeyDownEvent> { go { onKeyDown(it) } }
-		this.detatchCancellables += view.addEventListener<KeyUpEvent> { go { onKeyUp(it) } }
-		this.detatchCancellables += view.addEventListener<KeyTypedEvent> { go { onKeyTyped(it) } }
+		this.detatchCancellables += view.addEventListener<KeyDownEvent> {
+			go { onKeyDown(it) }
+			//onKeyDown.listenerCount > 0
+			false
+		}
+		this.detatchCancellables += view.addEventListener<KeyUpEvent> {
+			go { onKeyUp(it) }
+			//onKeyDown.listenerCount > 0
+			false
+		}
+		this.detatchCancellables += view.addEventListener<KeyTypedEvent> {
+			go { onKeyTyped(it) }
+			//onKeyDown.listenerCount > 0
+			false
+		}
 	}
 }
 

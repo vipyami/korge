@@ -21,7 +21,7 @@ open class Component(val view: View) : CoroutineContextHolder {
 
 	open fun update(dtMs: Int): Unit = Unit
 
-	inline fun <reified T : Any> addEventListener(noinline handler: (T) -> Unit) {
+	inline fun <reified T : Any> addEventListener(noinline handler: (T) -> Boolean) {
 		detatchCancellables += this.view.addEventListener<T>(handler)
 	}
 }
