@@ -24,8 +24,11 @@ package com.dragonbones.model
 
 import com.dragonbones.core.*
 import com.dragonbones.geom.*
+import com.dragonbones.geom.ColorTransform
 import com.dragonbones.util.*
 import com.soywiz.kds.*
+import com.soywiz.korim.color.*
+
 
 /**
  * - The armature data.
@@ -64,7 +67,7 @@ class ArmatureData(pool: BaseObjectPool) : BaseObject(pool) {
 	/**
 	 * @private
 	 */
-	var scale: Double = 1.0
+	var scale: Float = 1f
 	/**
 	 * - The armature name.
 	 * @version DragonBones 3.0
@@ -193,7 +196,7 @@ class ArmatureData(pool: BaseObjectPool) : BaseObject(pool) {
 		this.type = ArmatureType.Armature
 		this.frameRate = 0
 		this.cacheFrameRate = 0
-		this.scale = 1.0
+		this.scale = 1f
 		this.name = ""
 		this.aabb.clear()
 		this.animationNames.clear()
@@ -279,16 +282,16 @@ class ArmatureData(pool: BaseObjectPool) : BaseObject(pool) {
 		val arrayOffset = dataArray.size
 
 		dataArray.lengthSet += 10
-		dataArray[arrayOffset] = globalTransformMatrix.a.toDouble()
-		dataArray[arrayOffset + 1] = globalTransformMatrix.b.toDouble()
-		dataArray[arrayOffset + 2] = globalTransformMatrix.c.toDouble()
-		dataArray[arrayOffset + 3] = globalTransformMatrix.d.toDouble()
-		dataArray[arrayOffset + 4] = globalTransformMatrix.tx.toDouble()
-		dataArray[arrayOffset + 5] = globalTransformMatrix.ty.toDouble()
-		dataArray[arrayOffset + 6] = transform.rotation.toDouble()
-		dataArray[arrayOffset + 7] = transform.skew.toDouble()
-		dataArray[arrayOffset + 8] = transform.scaleX.toDouble()
-		dataArray[arrayOffset + 9] = transform.scaleY.toDouble()
+		dataArray[arrayOffset] = globalTransformMatrix.a
+		dataArray[arrayOffset + 1] = globalTransformMatrix.b
+		dataArray[arrayOffset + 2] = globalTransformMatrix.c
+		dataArray[arrayOffset + 3] = globalTransformMatrix.d
+		dataArray[arrayOffset + 4] = globalTransformMatrix.tx
+		dataArray[arrayOffset + 5] = globalTransformMatrix.ty
+		dataArray[arrayOffset + 6] = transform.rotation
+		dataArray[arrayOffset + 7] = transform.skew
+		dataArray[arrayOffset + 8] = transform.scaleX
+		dataArray[arrayOffset + 9] = transform.scaleY
 
 		return arrayOffset
 	}
@@ -298,16 +301,16 @@ class ArmatureData(pool: BaseObjectPool) : BaseObject(pool) {
 	 */
 	fun getCacheFrame(globalTransformMatrix: Matrix, transform: Transform, arrayOffset: Int) {
 		val dataArray = this.parent!!.cachedFrames
-		globalTransformMatrix.a = dataArray[arrayOffset].toFloat()
-		globalTransformMatrix.b = dataArray[arrayOffset + 1].toFloat()
-		globalTransformMatrix.c = dataArray[arrayOffset + 2].toFloat()
-		globalTransformMatrix.d = dataArray[arrayOffset + 3].toFloat()
-		globalTransformMatrix.tx = dataArray[arrayOffset + 4].toFloat()
-		globalTransformMatrix.ty = dataArray[arrayOffset + 5].toFloat()
-		transform.rotation = dataArray[arrayOffset + 6].toFloat()
-		transform.skew = dataArray[arrayOffset + 7].toFloat()
-		transform.scaleX = dataArray[arrayOffset + 8].toFloat()
-		transform.scaleY = dataArray[arrayOffset + 9].toFloat()
+		globalTransformMatrix.a = dataArray[arrayOffset]
+		globalTransformMatrix.b = dataArray[arrayOffset + 1]
+		globalTransformMatrix.c = dataArray[arrayOffset + 2]
+		globalTransformMatrix.d = dataArray[arrayOffset + 3]
+		globalTransformMatrix.tx = dataArray[arrayOffset + 4]
+		globalTransformMatrix.ty = dataArray[arrayOffset + 5]
+		transform.rotation = dataArray[arrayOffset + 6]
+		transform.skew = dataArray[arrayOffset + 7]
+		transform.scaleX = dataArray[arrayOffset + 8]
+		transform.scaleY = dataArray[arrayOffset + 9]
 		transform.x = globalTransformMatrix.tx
 		transform.y = globalTransformMatrix.ty
 	}
@@ -509,11 +512,11 @@ open class BoneData(pool: BaseObjectPool) : BaseObject(pool) {
 	 * @version DragonBones 3.0
 	 * @language zh_CN
 	 */
-	var length: Double = 0.0
+	var length: Float = 0f
 	/**
 	 * @private
 	 */
-	var alpha: Double = 1.0
+	var alpha: Float = 1f
 	/**
 	 * - The bone name.
 	 * @version DragonBones 3.0
@@ -559,8 +562,8 @@ open class BoneData(pool: BaseObjectPool) : BaseObject(pool) {
 		this.inheritScale = false
 		this.inheritReflection = false
 		this.isSurface = false
-		this.length = 0.0
-		this.alpha = 1.0
+		this.length = 0f
+		this.alpha = 1f
 		this.name = ""
 		this.transform.identity()
 		this.userData = null
@@ -629,7 +632,7 @@ class SlotData(pool: BaseObjectPool) : BaseObject(pool) {
 	/**
 	 * @private
 	 */
-	var alpha: Double = 1.0
+	var alpha: Float = 1f
 	/**
 	 * - The slot name.
 	 * @version DragonBones 3.0
@@ -667,7 +670,7 @@ class SlotData(pool: BaseObjectPool) : BaseObject(pool) {
 		this.displayIndex = 0
 		this.zOrder = 0
 		this.zIndex = 0
-		this.alpha = 1.0
+		this.alpha = 1f
 		this.name = ""
 		this.color = null //
 		this.userData = null

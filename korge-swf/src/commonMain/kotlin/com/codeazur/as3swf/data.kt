@@ -4,7 +4,7 @@ import com.codeazur.as3swf.*
 import com.soywiz.korim.vector.*
 import com.soywiz.korio.lang.*
 import com.soywiz.korio.util.*
-import com.soywiz.korma.*
+
 import com.soywiz.korma.geom.*
 import kotlin.collections.set
 import kotlin.math.*
@@ -534,7 +534,7 @@ class SWFFillStyle {
 class SWFFocalGradient : SWFGradient() {
 	override fun parse(data: SWFData, level: Int) {
 		super.parse(data, level)
-		focalPoint = data.readFIXED8()
+		focalPoint = data.readFIXED8().toFloat()
 	}
 
 	override fun toString(): String = "(" + records.joinToString(",") + ")"
@@ -562,7 +562,7 @@ open class SWFGradient {
 	var interpolationMode: GradientInterpolationMode = GradientInterpolationMode.NORMAL
 
 	// Forward declarations of properties in SWFFocalGradient
-	var focalPoint: Double = 0.0
+	var focalPoint: Float = 0f
 
 	var records = ArrayList<SWFGradientRecord>()
 
@@ -623,7 +623,7 @@ open class SWFLineStyle {
 	var noVScaleFlag: Boolean = false
 	var pixelHintingFlag: Boolean = false
 	var noClose: Boolean = false
-	var miterLimitFactor: Double = 3.0
+	var miterLimitFactor: Float = 3f
 	var fillType: SWFFillStyle? = null
 
 	open fun parse(data: SWFData, level: Int = 1) {
@@ -649,7 +649,7 @@ class SWFLineStyle2 : SWFLineStyle() {
 		data.readUB(5)
 		noClose = (data.readUB(1) == 1)
 		endCapsStyle = LineCapsStyle[data.readUB(2)]
-		if (jointStyle == LineJointStyle.MITER) miterLimitFactor = data.readFIXED8()
+		if (jointStyle == LineJointStyle.MITER) miterLimitFactor = data.readFIXED8().toFloat()
 		if (hasFillFlag) {
 			fillType = data.readFILLSTYLE(level)
 		} else {
@@ -687,8 +687,8 @@ class SWFMatrix {
 	var yscale: Double = 0.0
 	var rotation: Double = 0.0
 
-	val matrix: Matrix2d
-		get() = Matrix2d(
+	val matrix: Matrix
+		get() = Matrix(
 			scaleX,
 			rotateSkew0,
 			rotateSkew1,
@@ -717,7 +717,7 @@ class SWFMatrix {
 		translateX = data.readSB(translateBits)
 		translateY = data.readSB(translateBits)
 		// conversion to rotation, xscale, yscale
-		val px = matrix.deltaTransformPoint(Point2d(0.0, 1.0))
+		val px = matrix.deltaTransformPoint(Point(0.0, 1.0))
 		rotation = ((180 / PI) * atan2(px.y, px.x) - 90)
 		if (rotation < 0) rotation += 360
 		xscale = sqrt(scaleX * scaleX + rotateSkew0 * rotateSkew0)
@@ -765,7 +765,7 @@ class SWFMorphFillStyle {
 		}
 	}
 
-	fun getMorphedFillStyle(ratio: Double): SWFFillStyle {
+	fun getMorphedFillStyle(ratio: Float): SWFFillStyle {
 		val fillStyle = SWFFillStyle()
 		fillStyle.type = type
 		when (type) {
@@ -806,7 +806,7 @@ class SWFMorphFocalGradient : SWFMorphGradient() {
 		endFocalPoint = data.readFIXED8()
 	}
 
-	override fun getMorphedGradient(ratio: Double): SWFGradient {
+	override fun getMorphedGradient(ratio: Float): SWFGradient {
 		val gradient = SWFGradient()
 		// TODO: focalPoint
 		for (i in 0 until records.size) {
@@ -840,7 +840,7 @@ open class SWFMorphGradient {
 		}
 	}
 
-	open fun getMorphedGradient(ratio: Double = 0.0): SWFGradient {
+	open fun getMorphedGradient(ratio: Float = 0f): SWFGradient {
 		val gradient = SWFGradient()
 		for (i in 0 until records.size) {
 			gradient.records.add(records[i].getMorphedGradientRecord(ratio))
@@ -866,7 +866,7 @@ class SWFMorphGradientRecord {
 		endColor = data.readRGBA()
 	}
 
-	fun getMorphedGradientRecord(ratio: Double = 0.0): SWFGradientRecord {
+	fun getMorphedGradientRecord(ratio: Float = 0f): SWFGradientRecord {
 		val gradientRecord = SWFGradientRecord()
 		gradientRecord.color = ColorUtils.interpolate(startColor, endColor, ratio)
 		gradientRecord.ratio = (startRatio + (endRatio - startRatio) * ratio).toInt()
@@ -892,7 +892,7 @@ open class SWFMorphLineStyle {
 	var noVScaleFlag: Boolean = false
 	var pixelHintingFlag: Boolean = false
 	var noClose: Boolean = false
-	var miterLimitFactor: Double = 3.0
+	var miterLimitFactor: Float = 3f
 	var fillType: SWFMorphFillStyle? = null
 
 	open fun parse(data: SWFData, level: Int = 1) {
@@ -902,7 +902,7 @@ open class SWFMorphLineStyle {
 		endColor = data.readRGBA()
 	}
 
-	fun getMorphedLineStyle(ratio: Double = 0.0): SWFLineStyle {
+	fun getMorphedLineStyle(ratio: Float = 0f): SWFLineStyle {
 		val lineStyle = SWFLineStyle()
 		if (hasFillFlag) {
 			lineStyle.fillType = fillType!!.getMorphedFillStyle(ratio)
@@ -918,7 +918,7 @@ open class SWFMorphLineStyle {
 		lineStyle.noVScaleFlag = noVScaleFlag
 		lineStyle.pixelHintingFlag = pixelHintingFlag
 		lineStyle.noClose = noClose
-		lineStyle.miterLimitFactor = miterLimitFactor
+		lineStyle.miterLimitFactor = miterLimitFactor.toFloat()
 		return lineStyle
 	}
 
@@ -943,7 +943,7 @@ class SWFMorphLineStyle2 : SWFMorphLineStyle() {
 		var reserved: Int = data.readUB(5)
 		noClose = (data.readUB(1) == 1)
 		endCapsStyle = LineCapsStyle[data.readUB(2)]
-		if (jointStyle == LineJointStyle.MITER) miterLimitFactor = data.readFIXED8()
+		if (jointStyle == LineJointStyle.MITER) miterLimitFactor = data.readFIXED8().toFloat()
 		if (hasFillFlag) {
 			fillType = data.readMORPHFILLSTYLE(level)
 		} else {
@@ -1014,10 +1014,10 @@ class SWFRectangle(
 
 	val rect: Rectangle
 		get() {
-			_rectangle.left = NumberUtils.roundPixels20(xmin.toDouble() / 20)
-			_rectangle.right = NumberUtils.roundPixels20(xmax.toDouble() / 20)
-			_rectangle.top = NumberUtils.roundPixels20(ymin.toDouble() / 20)
-			_rectangle.bottom = NumberUtils.roundPixels20(ymax.toDouble() / 20)
+			_rectangle.left = NumberUtils.roundPixels20(xmin.toFloat() / 20f)
+			_rectangle.right = NumberUtils.roundPixels20(xmax.toFloat() / 20f)
+			_rectangle.top = NumberUtils.roundPixels20(ymin.toFloat() / 20f)
+			_rectangle.bottom = NumberUtils.roundPixels20(ymax.toFloat() / 20f)
 			return _rectangle
 		}
 
@@ -1041,12 +1041,12 @@ class SWFScene(var offset: Int, var name: String) {
 	override fun toString() = "Frame: $offset, Name: $name"
 }
 
-open class SWFShape(var unitDivisor: Double = 20.0) {
+open class SWFShape(var unitDivisor: Float = 20f) {
 	var records = ArrayList<SWFShapeRecord>()
 
 	var fillStyles = ArrayList<SWFFillStyle>()
 	var lineStyles = ArrayList<SWFLineStyle>()
-	var referencePoint = MPoint2d(0, 0)
+	var referencePoint = Point(0, 0)
 
 	private var fillEdgeMaps = ArrayList<HashMap<Int, ArrayList<IEdge>>>()
 	private var lineEdgeMaps = ArrayList<HashMap<Int, ArrayList<IEdge>>>()
@@ -1132,11 +1132,11 @@ open class SWFShape(var unitDivisor: Double = 20.0) {
 
 	protected fun createEdgeMaps() {
 		if (!edgeMapsCreated) {
-			var xPos = 0.0
-			var yPos = 0.0
-			var from: Point2d
-			var to: Point2d
-			var control: Point2d
+			var xPos = 0f
+			var yPos = 0f
+			var from: Point
+			var to: Point
+			var control: Point
 			var fillStyleIdxOffset = 0
 			var lineStyleIdxOffset = 0
 			var currentFillStyleIdx0 = 0
@@ -1200,7 +1200,7 @@ open class SWFShape(var unitDivisor: Double = 20.0) {
 					}
 					SWFShapeRecord.TYPE_STRAIGHTEDGE -> {
 						val straightEdgeRecord: SWFShapeRecordStraightEdge = shapeRecord as SWFShapeRecordStraightEdge
-						from = Point2d(NumberUtils.roundPixels400(xPos), NumberUtils.roundPixels400(yPos))
+						from = Point(NumberUtils.roundPixels400(xPos), NumberUtils.roundPixels400(yPos))
 						if (straightEdgeRecord.generalLineFlag) {
 							xPos += straightEdgeRecord.deltaX / unitDivisor
 							yPos += straightEdgeRecord.deltaY / unitDivisor
@@ -1211,18 +1211,18 @@ open class SWFShape(var unitDivisor: Double = 20.0) {
 								xPos += straightEdgeRecord.deltaX / unitDivisor
 							}
 						}
-						to = Point2d(NumberUtils.roundPixels400(xPos), NumberUtils.roundPixels400(yPos))
+						to = Point(NumberUtils.roundPixels400(xPos), NumberUtils.roundPixels400(yPos))
 						subPath.add(StraightEdge(from, to, currentLineStyleIdx, currentFillStyleIdx1))
 					}
 					SWFShapeRecord.TYPE_CURVEDEDGE -> {
 						val curvedEdgeRecord: SWFShapeRecordCurvedEdge = shapeRecord as SWFShapeRecordCurvedEdge
-						from = Point2d(NumberUtils.roundPixels400(xPos), NumberUtils.roundPixels400(yPos))
-						val xPosControl: Double = xPos + curvedEdgeRecord.controlDeltaX / unitDivisor
-						val yPosControl: Double = yPos + curvedEdgeRecord.controlDeltaY / unitDivisor
+						from = Point(NumberUtils.roundPixels400(xPos), NumberUtils.roundPixels400(yPos))
+						val xPosControl: Float = xPos + curvedEdgeRecord.controlDeltaX / unitDivisor
+						val yPosControl: Float = yPos + curvedEdgeRecord.controlDeltaY / unitDivisor
 						xPos = xPosControl + curvedEdgeRecord.anchorDeltaX / unitDivisor
 						yPos = yPosControl + curvedEdgeRecord.anchorDeltaY / unitDivisor
-						control = Point2d(xPosControl, yPosControl)
-						to = Point2d(NumberUtils.roundPixels400(xPos), NumberUtils.roundPixels400(yPos))
+						control = Point(xPosControl, yPosControl)
+						to = Point(NumberUtils.roundPixels400(xPos), NumberUtils.roundPixels400(yPos))
 						subPath.add(CurvedEdge(from, control, to, currentLineStyleIdx, currentFillStyleIdx1))
 					}
 					SWFShapeRecord.TYPE_END -> {
@@ -1277,7 +1277,7 @@ open class SWFShape(var unitDivisor: Double = 20.0) {
 
 	protected fun exportFillPath(handler: ShapeExporter, groupIndex: Int) {
 		val path: ArrayList<IEdge> = createPathFromEdgeMap(fillEdgeMaps[groupIndex])
-		var pos = Point2d(Int.MAX_VALUE, Int.MAX_VALUE)
+		var pos = Point(Int.MAX_VALUE, Int.MAX_VALUE)
 		var fillStyleIdx: Int = Int.MAX_VALUE
 		if (path.size > 0) {
 			handler.beginFills()
@@ -1286,9 +1286,9 @@ open class SWFShape(var unitDivisor: Double = 20.0) {
 				if (fillStyleIdx != e.fillStyleIdx) {
 					if (fillStyleIdx != Int.MAX_VALUE) handler.endFill()
 					fillStyleIdx = e.fillStyleIdx
-					pos = Point2d(Int.MAX_VALUE, Int.MAX_VALUE)
+					pos = Point(Int.MAX_VALUE, Int.MAX_VALUE)
 					try {
-						var matrix: Matrix2d
+						var matrix: Matrix
 						val fillStyle: SWFFillStyle = fillStyles[fillStyleIdx - 1]
 						when (fillStyle.type) {
 							0x00 -> {
@@ -1300,7 +1300,7 @@ open class SWFShape(var unitDivisor: Double = 20.0) {
 							0x13 -> {
 								// Gradient fill
 								val colors = arrayListOf<Int>()
-								val alphas = arrayListOf<Double>()
+								val alphas = arrayListOf<Float>()
 								val ratios = arrayListOf<Int>()
 								matrix = fillStyle.gradientMatrix!!.matrix.clone()
 								for (gri in 0 until fillStyle.gradient!!.records.size) {
@@ -1323,7 +1323,7 @@ open class SWFShape(var unitDivisor: Double = 20.0) {
 							0x43 -> {
 								// Bitmap fill
 								val m = fillStyle.bitmapMatrix!!
-								matrix = Matrix2d()
+								matrix = Matrix()
 								matrix.createBox(
 									m.xscale / 20,
 									m.yscale / 20,
@@ -1363,16 +1363,16 @@ open class SWFShape(var unitDivisor: Double = 20.0) {
 
 	protected fun exportLinePath(handler: ShapeExporter, groupIndex: Int) {
 		val path = createPathFromEdgeMap(lineEdgeMaps[groupIndex])
-		var pos = Point2d(Int.MAX_VALUE, Int.MAX_VALUE)
+		var pos = Point(Int.MAX_VALUE, Int.MAX_VALUE)
 		var lineStyleIdx = Int.MAX_VALUE
 		if (path.size > 0) {
 			handler.beginLines()
-			var basePoint: Point2d? = null
+			var basePoint: Point? = null
 			for (i in 0 until path.size) {
 				val e: IEdge = path[i]
 				if (lineStyleIdx != e.lineStyleIdx) {
 					lineStyleIdx = e.lineStyleIdx
-					pos = Point2d(Int.MAX_VALUE, Int.MAX_VALUE)
+					pos = Point(Int.MAX_VALUE, Int.MAX_VALUE)
 					val lineStyle = try {
 						lineStyles[lineStyleIdx - 1]
 					} catch (e: Error) {
@@ -1387,7 +1387,7 @@ open class SWFShape(var unitDivisor: Double = 20.0) {
 						}
 
 						handler.lineStyle(
-							lineStyle.width.toDouble() / 20,
+							lineStyle.width.toFloat() / 20f,
 							ColorUtils.rgb(lineStyle.color),
 							ColorUtils.alpha(lineStyle.color),
 							lineStyle.pixelHintingFlag,
@@ -1404,7 +1404,7 @@ open class SWFShape(var unitDivisor: Double = 20.0) {
 								0x10, 0x12, 0x13 -> {
 									// Gradient fill
 									val colors = arrayListOf<Int>()
-									val alphas = arrayListOf<Double>()
+									val alphas = arrayListOf<Float>()
 									val ratios = arrayListOf<Int>()
 									var gradientRecord: SWFGradientRecord
 									val matrix = fillStyle.gradientMatrix!!.matrix.clone()
@@ -1426,7 +1426,7 @@ open class SWFShape(var unitDivisor: Double = 20.0) {
 						}
 					} else {
 						// We should never get here
-						handler.lineStyle(0.0)
+						handler.lineStyle(0f)
 					}
 				}
 				if (e.from != pos) {
@@ -1495,7 +1495,7 @@ open class SWFShape(var unitDivisor: Double = 20.0) {
 	protected fun createCoordMap(path: ArrayList<IEdge>) {
 		coordMap = hashMapOf()
 		for (i in 0 until path.size) {
-			val from: Point2d = path[i].from
+			val from: Point = path[i].from
 			val key = "${from.x}_${from.y}"
 			val coordMapArray = coordMap[key]
 			if (coordMapArray == null) {
@@ -1694,7 +1694,7 @@ data class SWFShapeRecordStyleChange(
 	override fun clone(): SWFShapeRecord = this.copy()
 }
 
-class SWFShapeWithStyle(unitDivisor: Double = 20.0) : SWFShape(unitDivisor) {
+class SWFShapeWithStyle(unitDivisor: Float = 20f) : SWFShape(unitDivisor) {
 	var initialFillStyles = ArrayList<SWFFillStyle>()
 	var initialLineStyles = ArrayList<SWFLineStyle>()
 

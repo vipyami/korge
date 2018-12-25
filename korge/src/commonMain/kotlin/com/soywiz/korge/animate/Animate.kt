@@ -1,6 +1,7 @@
 package com.soywiz.korge.animate
 
 import com.soywiz.kds.*
+import com.soywiz.klock.*
 import com.soywiz.kmem.*
 import com.soywiz.korag.*
 import com.soywiz.korge.audio.*
@@ -11,7 +12,7 @@ import com.soywiz.korim.bitmap.*
 import com.soywiz.korio.async.*
 import com.soywiz.korio.lang.*
 import com.soywiz.korio.util.*
-import com.soywiz.korma.*
+
 import com.soywiz.korma.geom.*
 import kotlinx.coroutines.*
 import kotlin.math.*
@@ -36,8 +37,8 @@ abstract class AnBaseShape(final override val library: AnLibrary, final override
 	abstract val texHeight: Float
 	abstract val smoothing: Boolean
 
-	val posCuts = arrayOf(MPoint2d(0.0, 0.0), MPoint2d(0.25, 0.25), MPoint2d(0.75, 0.75), MPoint2d(1.0, 1.0))
-	val texCuts = arrayOf(MPoint2d(0.0, 0.0), MPoint2d(0.25, 0.25), MPoint2d(0.75, 0.75), MPoint2d(1.0, 1.0))
+	val posCuts = arrayOf(Point(0.0, 0.0), Point(0.25, 0.25), Point(0.75, 0.75), Point(1.0, 1.0))
+	val texCuts = arrayOf(Point(0.0, 0.0), Point(0.25, 0.25), Point(0.75, 0.75), Point(1.0, 1.0))
 
 	override fun renderInternal(ctx: RenderContext) {
 		if (!visible) return
@@ -96,9 +97,9 @@ abstract class AnBaseShape(final override val library: AnLibrary, final override
 		}
 	}
 
-	override fun hitTest(x: Double, y: Double): View? {
-		val sLeft = dx.toDouble()
-		val sTop = dy.toDouble()
+	override fun hitTest(x: Float, y: Float): View? {
+		val sLeft = dx
+		val sTop = dy
 		val sRight = sLeft + texWidth
 		val sBottom = sTop + texHeight
 		return if (checkGlobalBounds(x, y, sLeft, sTop, sRight, sBottom) &&
@@ -139,11 +140,11 @@ class AnMorphShape(library: AnLibrary, val morphSymbol: AnSymbolMorphShape) : An
 	override var smoothing = true
 
 	private fun updatedRatio() {
-		val result = morphSymbol.texturesWithBitmap.find((ratio * 1000).toInt(), timedResult)
+		val result = morphSymbol.texturesWithBitmap.find(ratio.milliseconds, timedResult)
 		texWBS = result.left ?: result.right
 
-		dx = texWBS?.bounds?.x?.toFloat() ?: 0f
-		dy = texWBS?.bounds?.y?.toFloat() ?: 0f
+		dx = texWBS?.bounds?.x ?: 0f
+		dy = texWBS?.bounds?.y ?: 0f
 		tex = texWBS?.texture ?: Bitmaps.transparent
 		texScale = texWBS?.scale ?: 1.0
 		texWidth = (tex.width / texScale).toFloat()
@@ -151,7 +152,7 @@ class AnMorphShape(library: AnLibrary, val morphSymbol: AnSymbolMorphShape) : An
 		smoothing = true
 	}
 
-	override var ratio = 0.0
+	override var ratio = 0f
 		set(value) {
 			field = value
 			updatedRatio()
@@ -207,10 +208,10 @@ class TimelineRunner(val view: AnMovieClip, val symbol: AnSymbolMovieClip) {
 	//var firstUpdateSingleFrame = false
 	val library: AnLibrary = view.library
 	val views = library.views
-	var currentTime = 0
+	var currentTime = 0.seconds
 	var currentStateName: String? = null
 	var currentSubtimeline: AnSymbolMovieClipSubTimeline? = null
-	val currentStateTotalTime: Int get() = currentSubtimeline?.totalTime ?: 0
+	val currentStateTotalTime: TimeSpan get() = currentSubtimeline?.totalTime ?: 0.seconds
 	val onStop = Signal<Unit>()
 	val onChangeState = Signal<String>()
 	val onEvent = Signal<String>()
@@ -227,12 +228,12 @@ class TimelineRunner(val view: AnMovieClip, val symbol: AnSymbolMovieClip) {
 		gotoAndPlay("default")
 	}
 
-	fun getStateTime(name: String): Int {
-		val substate = symbol.states[name] ?: return 0
+	fun getStateTime(name: String): TimeSpan {
+		val substate = symbol.states[name] ?: return 0.milliseconds
 		return substate.subTimeline.totalTime - substate.startTime
 	}
 
-	fun gotoAndRunning(running: Boolean, name: String, time: Int = 0) {
+	fun gotoAndRunning(running: Boolean, name: String, time: TimeSpan = 0.seconds) {
 		val substate = symbol.states[name]
 		if (substate != null) {
 			this.currentStateName = substate.name
@@ -240,16 +241,16 @@ class TimelineRunner(val view: AnMovieClip, val symbol: AnSymbolMovieClip) {
 			this.currentTime = substate.startTime + time
 			this.running = running
 			//this.firstUpdateSingleFrame = true
-			update(0)
+			update(0.milliseconds)
 			onChangeState(name)
 		}
 		//println("currentStateName: $currentStateName, running=$running, currentTime=$currentTime, time=$time, totalTime=$currentStateTotalTime")
 	}
 
-	fun gotoAndPlay(name: String, time: Int = 0) = gotoAndRunning(true, name, time)
-	fun gotoAndStop(name: String, time: Int = 0) = gotoAndRunning(false, name, time)
+	fun gotoAndPlay(name: String, time: TimeSpan = 0.seconds) = gotoAndRunning(true, name, time)
+	fun gotoAndStop(name: String, time: TimeSpan = 0.seconds) = gotoAndRunning(false, name, time)
 
-	fun update(time: Int) {
+	fun update(time: TimeSpan) {
 		//println("Update[1]: $currentTime")
 		//println("$currentStateName: $currentTime: running=$running")
 		if (!running) return
@@ -257,7 +258,7 @@ class TimelineRunner(val view: AnMovieClip, val symbol: AnSymbolMovieClip) {
 		if (currentSubtimeline == null) return
 		//println("Update[3]: $currentTime")
 		val cs = currentSubtimeline!!
-		eval(currentTime, min(currentStateTotalTime, currentTime + time))
+		eval(currentTime, min(currentStateTotalTime.milliseconds, (currentTime + time).milliseconds).milliseconds)
 		currentTime += time
 		//println("Update[4]: $currentTime : delta=$time")
 		if (currentTime >= currentStateTotalTime) {
@@ -269,7 +270,7 @@ class TimelineRunner(val view: AnMovieClip, val symbol: AnSymbolMovieClip) {
 				running = false
 			} else {
 				//gotoAndRunning(cs.nextStatePlay, nextState, accumulatedTime)
-				gotoAndRunning(cs.nextStatePlay, nextState, 0)
+				gotoAndRunning(cs.nextStatePlay, nextState, 0.milliseconds)
 				currentTime += accumulatedTime
 				eval(currentTime - accumulatedTime, currentTime)
 			}
@@ -279,10 +280,10 @@ class TimelineRunner(val view: AnMovieClip, val symbol: AnSymbolMovieClip) {
 
 	private val tempRangeResult = Timed.RangeResult()
 
-	private fun eval(prev: Int, current: Int) {
+	private fun eval(prev: TimeSpan, current: TimeSpan) {
 		if (prev >= current) return
 		val actionsTimeline = this.currentSubtimeline?.actions ?: return
-		val result = actionsTimeline.getRangeIndices(prev, current - 1, out = tempRangeResult)
+		val result = actionsTimeline.getRangeIndices(prev, current - 1.microseconds, out = tempRangeResult)
 
 		execution@ for (n in result.startIndex..result.endIndex) {
 			val action = actionsTimeline.objects[n]
@@ -308,11 +309,11 @@ class TimelineRunner(val view: AnMovieClip, val symbol: AnSymbolMovieClip) {
 }
 
 interface AnPlayable {
-	fun play(name: String): Unit
+	fun play(name: String)
 }
 
 class AnSimpleAnimation(
-	val frameTime: Int,
+	val frameTime: TimeSpan,
 	val animations: Map<String, List<BmpSlice?>>,
 	val anchor: Anchor = Anchor.TOP_LEFT
 ) : Container(), AnPlayable {
@@ -322,7 +323,7 @@ class AnSimpleAnimation(
 	val defaultAnimation = animations.values.firstOrNull() ?: listOf()
 	var animation = defaultAnimation
 	val numberOfFrames get() = animation.size
-	private var elapsedTime = 0
+	private var elapsedTime = 0.seconds
 
 	init {
 		image.anchorX = anchor.sx
@@ -336,14 +337,14 @@ class AnSimpleAnimation(
 	}
 
 	init {
-		addUpdatable { dtMs ->
-			elapsedTime = (elapsedTime + dtMs) % (numberOfFrames * frameTime)
+		addUpdatable { time ->
+			elapsedTime = ((elapsedTime + time).milliseconds % (frameTime * numberOfFrames).milliseconds).milliseconds
 			myupdate()
 		}
 	}
 
 	private fun myupdate() {
-		val frameNum = elapsedTime / frameTime
+		val frameNum = elapsedTime.millisecondsInt / frameTime.millisecondsInt
 		val bmpSlice = animation.getOrNull(frameNum % numberOfFrames) ?: Bitmaps.transparent
 		image.bitmap = bmpSlice
 	}
@@ -452,7 +453,7 @@ class AnMovieClip(override val library: AnLibrary, override val symbol: AnSymbol
 		//val STATE_CONTENT = STATE_NONE
 	}
 
-	private val tempMatrix = Matrix2d()
+	private val tempMatrix = Matrix()
 	override fun renderInternal(ctx: RenderContext) {
 		if (!visible) return
 
@@ -622,17 +623,17 @@ class AnMovieClip(override val library: AnLibrary, override val symbol: AnSymbol
 	/**
 	 * Changes the state, seeks a point in between the state and pauses it. Useful for interpolate between points, eg. progressBars.
 	 */
-	fun seekStill(name: String, ratio: Double = 0.0) {
+	fun seekStill(name: String, ratio: Float = 0f) {
 		val totalTime = timelineRunner.getStateTime(name)
-		timelineRunner.gotoAndStop(name, (totalTime * ratio).toInt())
+		timelineRunner.gotoAndStop(name, totalTime * ratio.toDouble())
 		//println("seekStill($name,$ratio) : $currentTime,$running,$currentState")
 		update()
 	}
 
-	private fun updateInternal(dtMs: Int) {
+	private fun updateInternal(time: TimeSpan) {
 		if (timelineRunner.running && (firstUpdate || !singleFrame)) {
 			firstUpdate = false
-			timelineRunner.update(dtMs * 1000)
+			timelineRunner.update(time)
 			update()
 		}
 	}
@@ -649,4 +650,4 @@ suspend fun View?.waitStop() = run { (this as? AnMovieClip?)?.waitStop() }
 suspend fun View?.waitEvent(vararg events: String) = run { (this as? AnMovieClip?)?.waitEvent(*events) }
 
 val View?.playingName: String? get() = (this as? AnMovieClip?)?.timelineRunner?.currentStateName
-fun View?.seekStill(name: String, ratio: Double = 0.0) = run { (this as? AnMovieClip?)?.seekStill(name, ratio) }
+fun View?.seekStill(name: String, ratio: Float = 0f) = run { (this as? AnMovieClip?)?.seekStill(name, ratio) }

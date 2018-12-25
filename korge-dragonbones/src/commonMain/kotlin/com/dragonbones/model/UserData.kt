@@ -62,7 +62,7 @@ class UserData(pool: BaseObjectPool) : BaseObject(pool) {
 	 * @version DragonBones 5.0
 	 * @language zh_CN
 	 */
-	val floats: DoubleArrayList = DoubleArrayList()
+	val floats: FloatArrayList = FloatArrayList()
 	/**
 	 * - The custom strings.
 	 * @version DragonBones 5.0
@@ -91,7 +91,7 @@ class UserData(pool: BaseObjectPool) : BaseObject(pool) {
 	/**
 	 * @internal
 	 */
-	fun addFloat(value: Double) {
+	fun addFloat(value: Float) {
 		this.floats.push(value)
 	}
 
@@ -124,7 +124,7 @@ class UserData(pool: BaseObjectPool) : BaseObject(pool) {
 	 * @version DragonBones 5.0
 	 * @language zh_CN
 	 */
-	fun getFloat(index: Int = 0): Double = if (index >= 0 && index < this.floats.length) this.floats[index] else 0.0
+	fun getFloat(index: Int = 0): Float = if (index >= 0 && index < this.floats.length) this.floats[index] else 0f
 	/**
 	 * - Get the custom string.
 	 * @version DragonBones 5.0

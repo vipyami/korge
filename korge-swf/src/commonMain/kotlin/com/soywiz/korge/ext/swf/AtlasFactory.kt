@@ -31,8 +31,8 @@ suspend fun <T> Map<T, BitmapWithScale>.toAtlas(
 	//val packs = BinPacker.packSeveral(2048.0, 2048.0, this) { Size(it.width + 4, it.height + 4) }
 	val values = this.values.toList()
 	val packs = BinPacker.packSeveral(
-		maxTextureSide.toDouble(),
-		maxTextureSide.toDouble(),
+		maxTextureSide.toFloat(),
+		maxTextureSide.toFloat(),
 		values
 	) { Size((it.width + 4).nextAlignedTo(4), (it.height + 4).nextAlignedTo(4)) }
 	val bitmapsToTextures = hashMapOf<BitmapWithScale, TextureWithBitmapSlice>()

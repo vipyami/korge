@@ -28,6 +28,7 @@ import com.dragonbones.util.*
 import com.soywiz.kds.*
 import com.soywiz.kmem.*
 
+
 /**
  * @private
  */
@@ -186,7 +187,7 @@ class PathDisplayData(pool: BaseObjectPool) :  DisplayData(pool) {
 	var closed: Boolean = false
 	var constantSpeed: Boolean = false
 	val geometry: GeometryData = GeometryData()
-	var curveLengths: DoubleArray = DoubleArray(0)
+	var curveLengths: FloatArray = FloatArray(0)
 
 	override fun _onClear() {
 		super._onClear()
@@ -195,7 +196,7 @@ class PathDisplayData(pool: BaseObjectPool) :  DisplayData(pool) {
 		this.closed = false
 		this.constantSpeed = false
 		this.geometry.clear()
-		this.curveLengths = DoubleArray(0)
+		this.curveLengths = FloatArray(0)
 	}
 }
 /**

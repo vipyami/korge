@@ -8,8 +8,8 @@ object Spike1 {
 	@JvmStatic fun main(args: Array<String>) {
 		Korge {
 			solidRect(100, 100, Colors.RED).apply {
-				x = 100.0
-				y = 100.0
+				x = 100f
+				y = 100f
 			}
 		}
 	}

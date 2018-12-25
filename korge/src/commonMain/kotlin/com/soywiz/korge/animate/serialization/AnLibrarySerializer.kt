@@ -10,7 +10,7 @@ import com.soywiz.korio.file.*
 import com.soywiz.korio.serialization.json.*
 import com.soywiz.korio.stream.*
 import com.soywiz.korio.file.*
-import com.soywiz.korma.*
+
 import com.soywiz.korma.geom.*
 
 suspend fun AnLibrary.writeTo(file: VfsFile, config: AnLibrarySerializer.Config = AnLibrarySerializer.Config()) {
@@ -221,7 +221,7 @@ object AnLibrarySerializer {
 					writeU_VL(symbolStates.size)
 					for (ss in symbolStates) {
 						//writeU_VL(strings[ss.name])
-						writeU_VL(ss.totalTime)
+						writeU_VL(ss.totalTime.microseconds.toInt())
 						write8(
 							0
 								.insert(ss.nextStatePlay, 0)
@@ -258,10 +258,10 @@ object AnLibrarySerializer {
 							val frames = timeline.entries
 							var lastUid = -1
 							var lastName: String? = null
-							var lastColorTransform: ColorTransform = ColorTransform()
-							var lastMatrix: Matrix2d = Matrix2d()
+							var lastColorTransform = ColorTransform()
+							var lastMatrix = Matrix()
 							var lastClipDepth = -1
-							var lastRatio = 0.0
+							var lastRatio = 0.0f
 							var lastBlendMode = BlendMode.INHERIT
 							writeU_VL(frames.size)
 							var lastFrameTime = 0
@@ -335,10 +335,10 @@ object AnLibrarySerializer {
 											.insert(hasAA, 7)
 									)
 
-									if (hasMR) write8((ct.mR.clamp(0.0, 1.0) * 255.0).toInt())
-									if (hasMG) write8((ct.mG.clamp(0.0, 1.0) * 255.0).toInt())
-									if (hasMB) write8((ct.mB.clamp(0.0, 1.0) * 255.0).toInt())
-									if (hasMA) write8((ct.mA.clamp(0.0, 1.0) * 255.0).toInt())
+									if (hasMR) write8((ct.mR.clamp(0f, 1f) * 255f).toInt())
+									if (hasMG) write8((ct.mG.clamp(0f, 1f) * 255f).toInt())
+									if (hasMB) write8((ct.mB.clamp(0f, 1f) * 255f).toInt())
+									if (hasMA) write8((ct.mA.clamp(0f, 1f) * 255f).toInt())
 									if (hasAR) write8(ct.aR.clamp(-255, +255) / 2)
 									if (hasAG) write8(ct.aG.clamp(-255, +255) / 2)
 									if (hasAB) write8(ct.aB.clamp(-255, +255) / 2)
@@ -392,7 +392,7 @@ object AnLibrarySerializer {
 					for ((name, ssi) in symbol.states) {
 						val stateIndex = symbolStateToIndex[ssi.subTimeline] ?: 0
 						writeU_VL(strings[name])
-						writeU_VL(ssi.startTime)
+						writeU_VL(ssi.startTime.microseconds.toInt())
 						writeU_VL(stateIndex)
 					}
 				}

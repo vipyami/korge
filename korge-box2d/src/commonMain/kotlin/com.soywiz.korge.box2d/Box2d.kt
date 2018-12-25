@@ -38,7 +38,7 @@ class WorldView(val world: World = World(Vec2(0f, -10f))) : Container() {
 	init {
 		world[WorldViewKey] = this
 		addUpdatable {
-			world.step(it.toFloat() / 1000f, velocityIterations = 6, positionIterations = 2)
+			world.step(it.seconds.toFloat(), velocityIterations = 6, positionIterations = 2)
 			updateViews()
 		}
 	}
@@ -51,9 +51,9 @@ class WorldView(val world: World = World(Vec2(0f, -10f))) : Container() {
 				if (view.parent != this) {
 					this.addChild(view)
 				}
-				view.x = node.position.x.toDouble()
-				view.y = -node.position.y.toDouble()
-				view.rotationRadians = -node.angle.toDouble()
+				view.x = node.position.x
+				view.y = -node.position.y
+				view.rotationRadians = -node.angle
 			}
 			node = node.m_next
 		}

@@ -347,8 +347,8 @@ class SWFData : BitArray() {
 	fun readMATRIX(): SWFMatrix = SWFMatrix().apply { parse(this@SWFData) }
 	fun readCXFORM(): SWFColorTransform = SWFColorTransform().apply { parse(this@SWFData) }
 	fun readCXFORMWITHALPHA(): SWFColorTransformWithAlpha = SWFColorTransformWithAlpha().apply { parse(this@SWFData) }
-	fun readSHAPE(unitDivisor: Double = 20.0): SWFShape = SWFShape(unitDivisor).apply { parse(this@SWFData) }
-	fun readSHAPEWITHSTYLE(level: Int = 1, unitDivisor: Double = 20.0): SWFShapeWithStyle =
+	fun readSHAPE(unitDivisor: Float = 20f): SWFShape = SWFShape(unitDivisor).apply { parse(this@SWFData) }
+	fun readSHAPEWITHSTYLE(level: Int = 1, unitDivisor: Float = 20f): SWFShapeWithStyle =
 		SWFShapeWithStyle(unitDivisor).apply { parse(this@SWFData, level) }
 
 	fun readSTRAIGHTEDGERECORD(numBits: Int) = SWFShapeRecordStraightEdge(numBits).apply { parse(this@SWFData) }

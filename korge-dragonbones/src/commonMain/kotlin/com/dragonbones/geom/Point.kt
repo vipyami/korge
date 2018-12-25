@@ -1,4 +1,7 @@
 package com.dragonbones.geom
+
+
+
 /**
  * The MIT License (MIT)
  *
@@ -34,13 +37,13 @@ package com.dragonbones.geom
  */
 /**
  * - The horizontal coordinate.
- * @default 0.0
+ * @default 0f
  * @version DragonBones 3.0
  * @language en_US
  */
 /**
  * - The vertical coordinate.
- * @default 0.0
+ * @default 0f
  * @version DragonBones 3.0
  * @language en_US
  */
@@ -55,21 +58,21 @@ package com.dragonbones.geom
 class Point
 /**
  * - 创建一个 egret.Point 对象.若不传入任何参数，将会创建一个位于（0，0）位置的点。
- * @param x - 该对象的x属性值，默认为 0.0。
- * @param y - 该对象的y属性值，默认为 0.0。
+ * @param x - 该对象的x属性值，默认为 0f。
+ * @param y - 该对象的y属性值，默认为 0f。
  * @version DragonBones 3.0
  * @language zh_CN
  */(
 	/**
 	 * - 该点的水平坐标。
-	 * @default 0.0
+	 * @default 0f
 	 * @version DragonBones 3.0
 	 * @language zh_CN
 	 */
 	override var x: Float = 0f,
 	/**
 	 * - 该点的垂直坐标。
-	 * @default 0.0
+	 * @default 0f
 	 * @version DragonBones 3.0
 	 * @language zh_CN
 	 */
@@ -91,3 +94,9 @@ class Point
 		this.y = 0f
 	}
 }
+
+/*
+fun Point.clear() {
+	this.setTo(0f, 0f)
+}
+*/

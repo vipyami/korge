@@ -16,8 +16,8 @@ class ViewsTest : ViewsForTesting() {
 	@Test
 	fun testBounds() = viewsTest {
 		val image = Image(tex)
-		image.x = 100.0
-		image.y = 100.0
+		image.x = 100f
+		image.y = 100f
 		views.stage += image
 		assertEquals(Rectangle(100, 100, 10, 10), image.getGlobalBounds())
 	}
@@ -44,9 +44,9 @@ class ViewsTest : ViewsForTesting() {
 		lateinit var b: View
 		lateinit var c: View
 		val s1 = Container().apply {
-			this += SolidRect(100, 100, Colors.RED).apply { a = this; y = 100.0 }
-			this += SolidRect(100, 100, Colors.RED).apply { b = this; y = 50.0 }
-			this += SolidRect(100, 100, Colors.RED).apply { c = this; y = 0.0 }
+			this += SolidRect(100, 100, Colors.RED).apply { a = this; y = 100f }
+			this += SolidRect(100, 100, Colors.RED).apply { b = this; y = 50f }
+			this += SolidRect(100, 100, Colors.RED).apply { c = this; y = 0f }
 		}
 
 		fun View.toStr() = "($index,${y.niceStr})"
@@ -79,14 +79,14 @@ class ViewsTest : ViewsForTesting() {
 		val c = Container()
 		val s1 = SolidRect(100, 100, Colors.RED)
 		val s2 = SolidRect(100, 100, Colors.RED)
-		c += s1.apply { x = 0.0 }
-		c += s2.apply { x = 100.0 }
+		c += s1.apply { x = 0f }
+		c += s2.apply { x = 100f }
 		assertEquals(200, c.width.toInt())
 		assertEquals(100, c.height.toInt())
-		assertEquals(1.0, c.scaleX)
-		c.width = 400.0
+		assertEquals(1f, c.scaleX)
+		c.width = 400f
 		assertEquals(400, c.width.toInt())
 		assertEquals(100, c.height.toInt())
-		assertEquals(2.0, c.scaleX)
+		assertEquals(2f, c.scaleX)
 	}
 }

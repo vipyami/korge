@@ -25,6 +25,7 @@ package com.soywiz.korge.dragonbones
 
 import com.dragonbones.armature.*
 import com.dragonbones.core.*
+import com.dragonbones.geom.*
 import com.dragonbones.model.*
 import com.dragonbones.util.*
 import com.soywiz.kmem.*
@@ -32,7 +33,7 @@ import com.soywiz.korge.view.*
 import com.soywiz.korge.view.BlendMode
 import com.soywiz.korim.bitmap.*
 import com.soywiz.korim.color.*
-import com.soywiz.korma.*
+
 import kotlin.math.*
 
 /**
@@ -50,13 +51,13 @@ class KorgeDbSlot(pool: BaseObjectPool) : Slot(pool) {
 		return "[class DragonbonesSlot]"
 	}
 
-	private var _textureScale: Double = 1.0
+	private var _textureScale: Float = 1f
 	private var _renderDisplay: DisplayObject? = null
 
 	override fun _onClear() {
 		super._onClear()
 
-		this._textureScale = 1.0
+		this._textureScale = 1f
 		this._renderDisplay = null
 	}
 
@@ -84,7 +85,7 @@ class KorgeDbSlot(pool: BaseObjectPool) : Slot(pool) {
 		container.addChild(this._renderDisplay!!)
 		container.swapChildren(this._renderDisplay!!, prevDisplay)
 		container.removeChild(prevDisplay)
-		this._textureScale = 1.0
+		this._textureScale = 1f
 	}
 
 	override fun _removeDisplay() {
@@ -220,7 +221,7 @@ class KorgeDbSlot(pool: BaseObjectPool) : Slot(pool) {
 						}
 					}
 
-					this._textureScale = 1.0
+					this._textureScale = 1f
 					meshDisplay.texture = renderTexture
 					meshDisplay.dirty++
 					meshDisplay.indexDirty++
@@ -249,15 +250,15 @@ class KorgeDbSlot(pool: BaseObjectPool) : Slot(pool) {
 			val meshDisplay = this._renderDisplay as Mesh
 			//meshDisplay.texture = null as any
 			meshDisplay.texture = null
-			meshDisplay.x = 0.0
-			meshDisplay.y = 0.0
+			meshDisplay.x = 0f
+			meshDisplay.y = 0f
 			meshDisplay.visible = false
 		} else {
 			val normalDisplay = this._renderDisplay as Image
 			//normalDisplay.bitmap = null as any
 			normalDisplay.bitmap = Bitmaps.transparent
-			normalDisplay.x = 0.0
-			normalDisplay.y = 0.0
+			normalDisplay.x = 0f
+			normalDisplay.y = 0f
 			normalDisplay.visible = false
 		}
 	}
@@ -358,7 +359,7 @@ class KorgeDbSlot(pool: BaseObjectPool) : Slot(pool) {
 		meshDisplay.updatedVertices()
 	}
 
-	private val m = Matrix2d()
+	private val m = com.soywiz.korma.geom.Matrix()
 
 	override fun _updateTransform() {
 		this.updateGlobalTransform() // Update transform.
@@ -374,18 +375,18 @@ class KorgeDbSlot(pool: BaseObjectPool) : Slot(pool) {
 				?.position(x, y)
 				?.scale(transform.scaleX * this._textureScale, transform.scaleY * this._textureScale)
 				?.rotation(transform.rotation)
-				?.skew(-transform.skew, 0.0)
+				?.skew(-transform.skew, 0f)
 		} else {
 			this._renderDisplay
 				?.position(transform.x, transform.y)
 				?.scale(transform.scaleX, transform.scaleY)
 				?.rotation(transform.rotation)
-				?.skew(-transform.skew, 0.0)
+				?.skew(-transform.skew, 0f)
 		}
 	}
 
 	override fun _identityTransform() {
-		m.setToIdentity()
+		m.identity()
 		this._renderDisplay?.setMatrix(m)
 	}
 }

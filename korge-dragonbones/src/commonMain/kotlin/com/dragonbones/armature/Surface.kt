@@ -25,9 +25,8 @@ package com.dragonbones.armature
 import com.dragonbones.core.*
 import com.dragonbones.geom.*
 import com.dragonbones.model.*
-import com.dragonbones.util.*
-import com.soywiz.kds.*
 import com.soywiz.kmem.*
+
 import kotlin.math.*
 
 /**
@@ -224,7 +223,7 @@ class Surface(pool: BaseObjectPool) :  Bone(pool) {
 			isDown = y > _kX * (x + lA) + pY
 			matrixIndex = ((segmentX * segmentY + segmentX + segmentY + segmentY + indexY) * 2 + (if (isDown) 1 else 0)) * 7
 
-			if (matrices[matrixIndex] > 0.0) {
+			if (matrices[matrixIndex] > 0f) {
 				helpMatrix.copyFromArray(matrices, matrixIndex + 1)
 			}
 			else {
@@ -269,7 +268,7 @@ class Surface(pool: BaseObjectPool) :  Bone(pool) {
 			isDown = y > _kX * (x - lB) + pY
 			matrixIndex = ((segmentX * segmentY + segmentX + indexY) * 2 + (if (isDown) 1 else 0)) * 7
 
-			if (matrices[matrixIndex] > 0.0) {
+			if (matrices[matrixIndex] > 0f) {
 				helpMatrix.copyFromArray(matrices, matrixIndex + 1)
 			}
 			else {
@@ -314,7 +313,7 @@ class Surface(pool: BaseObjectPool) :  Bone(pool) {
 			isDown = y > _kY * (x - pX - dX) - lB
 			matrixIndex = ((segmentX * segmentY + indexX) * 2 + (if (isDown) 1 else 0)) * 7
 
-			if (matrices[matrixIndex] > 0.0) {
+			if (matrices[matrixIndex] > 0f) {
 				helpMatrix.copyFromArray(matrices, matrixIndex + 1)
 			}
 			else {
@@ -359,7 +358,7 @@ class Surface(pool: BaseObjectPool) :  Bone(pool) {
 			isDown = y > _kY * (x - pX - dX) + lA
 			matrixIndex = ((segmentX * segmentY + segmentX + segmentY + indexX) * 2 + (if (isDown) 1 else 0)) * 7
 
-			if (matrices[matrixIndex] > 0.0) {
+			if (matrices[matrixIndex] > 0f) {
 				helpMatrix.copyFromArray(matrices, matrixIndex + 1)
 			}
 			else {
@@ -400,7 +399,7 @@ class Surface(pool: BaseObjectPool) :  Bone(pool) {
 			isDown = y > _k * (x - pX - dX) + pY
 			matrixIndex = ((segmentX * indexY + indexX) * 2 + (if (isDown) 1 else 0)) * 7
 
-			if (matrices[matrixIndex] > 0.0) {
+			if (matrices[matrixIndex] > 0f) {
 				helpMatrix.copyFromArray(matrices, matrixIndex + 1)
 			}
 			else {

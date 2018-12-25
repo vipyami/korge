@@ -75,7 +75,7 @@ class AnimationConfig(pool: BaseObjectPool) : BaseObject(pool) {
 	/**
 	 * @private
 	 */
-	var fadeOutTime: Double = -1.0
+	var fadeOutTime: Float = -1f
 	/**
 	 * @private
 	 */
@@ -154,37 +154,37 @@ class AnimationConfig(pool: BaseObjectPool) : BaseObject(pool) {
 	var layer: Int = 0
 	/**
 	 * - The start time of play. (In seconds)
-	 * @default 0.0
+	 * @default 0f
 	 * @version DragonBones 5.0
 	 * @language en_US
 	 */
 	/**
 	 * - 播放的开始时间。 （以秒为单位）
-	 * @default 0.0
+	 * @default 0f
 	 * @version DragonBones 5.0
 	 * @language zh_CN
 	 */
-	var position: Double = 0.0
+	var position: Float = 0f
 	/**
 	 * - The duration of play.
 	 * [-1: Use the default value of the animation data, 0: Stop play, (0~N]: The duration] (In seconds)
-	 * @default -1.0
+	 * @default -1f
 	 * @version DragonBones 5.0
 	 * @language en_US
 	 */
 	/**
 	 * - 播放的持续时间。
 	 * [-1: 使用动画数据默认值, 0: 动画停止, (0~N]: 持续时间] （以秒为单位）
-	 * @default -1.0
+	 * @default -1f
 	 * @version DragonBones 5.0
 	 * @language zh_CN
 	 */
-	var duration: Double = -1.0
+	var duration: Float = -1f
 	/**
 	 * - The play speed.
 	 * The value is an overlay relationship with {@link dragonBones.Animation#timeScale}.
 	 * [(-N~0): Reverse play, 0: Stop play, (0~1): Slow play, 1: Normal play, (1~N): Fast play]
-	 * @default 1.0
+	 * @default 1f
 	 * @version DragonBones 3.0
 	 * @language en_US
 	 */
@@ -192,54 +192,54 @@ class AnimationConfig(pool: BaseObjectPool) : BaseObject(pool) {
 	 * - 播放速度。
 	 * 该值与 {@link dragonBones.Animation#timeScale} 是叠加关系。
 	 * [(-N~0): 倒转播放, 0: 停止播放, (0~1): 慢速播放, 1: 正常播放, (1~N): 快速播放]
-	 * @default 1.0
+	 * @default 1f
 	 * @version DragonBones 3.0
 	 * @language zh_CN
 	 */
-	var timeScale: Double = -100.0
+	var timeScale: Float = -100f
 	/**
 	 * - The blend weight.
-	 * @default 1.0
+	 * @default 1f
 	 * @version DragonBones 5.0
 	 * @language en_US
 	 */
 	/**
 	 * - 混合权重。
-	 * @default 1.0
+	 * @default 1f
 	 * @version DragonBones 5.0
 	 * @language zh_CN
 	 */
-	var weight: Double = 1.0
+	var weight: Float = 1f
 	/**
 	 * - The fade in time.
 	 * [-1: Use the default value of the animation data, [0~N]: The fade in time] (In seconds)
-	 * @default -1.0
+	 * @default -1f
 	 * @version DragonBones 5.0
 	 * @language en_US
 	 */
 	/**
 	 * - 淡入时间。
 	 * [-1: 使用动画数据默认值, [0~N]: 淡入时间] （以秒为单位）
-	 * @default -1.0
+	 * @default -1f
 	 * @version DragonBones 5.0
 	 * @language zh_CN
 	 */
-	var fadeInTime: Double = -1.0
+	var fadeInTime: Float = -1f
 	/**
 	 * - The auto fade out time when the animation state play completed.
 	 * [-1: Do not fade out automatically, [0~N]: The fade out time] (In seconds)
-	 * @default -1.0
+	 * @default -1f
 	 * @version DragonBones 5.0
 	 * @language en_US
 	 */
 	/**
 	 * - 动画状态播放完成后的自动淡出时间。
 	 * [-1: 不自动淡出, [0~N]: 淡出时间] （以秒为单位）
-	 * @default -1.0
+	 * @default -1f
 	 * @version DragonBones 5.0
 	 * @language zh_CN
 	 */
-	var autoFadeOutTime: Double = -1.0
+	var autoFadeOutTime: Float = -1f
 	/**
 	 * - The name of the animation state. (Can be different from the name of the animation data)
 	 * @version DragonBones 5.0
@@ -286,7 +286,7 @@ class AnimationConfig(pool: BaseObjectPool) : BaseObject(pool) {
 		this.pauseFadeOut = true
 		this.fadeOutMode = AnimationFadeOutMode.All
 		this.fadeOutTweenType = TweenType.Line
-		this.fadeOutTime = -1.0
+		this.fadeOutTime = -1f
 
 		this.actionEnabled = true
 		this.additive = false
@@ -296,12 +296,12 @@ class AnimationConfig(pool: BaseObjectPool) : BaseObject(pool) {
 		this.fadeInTweenType = TweenType.Line
 		this.playTimes = -1
 		this.layer = 0
-		this.position = 0.0
-		this.duration = -1.0
-		this.timeScale = -100.0
-		this.weight = 1.0
-		this.fadeInTime = -1.0
-		this.autoFadeOutTime = -1.0
+		this.position = 0f
+		this.duration = -1f
+		this.timeScale = -100f
+		this.weight = 1f
+		this.fadeInTime = -1f
+		this.autoFadeOutTime = -1f
 		this.name = ""
 		this.animation = ""
 		this.group = ""

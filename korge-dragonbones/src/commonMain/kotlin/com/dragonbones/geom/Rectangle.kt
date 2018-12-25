@@ -1,5 +1,7 @@
 package com.dragonbones.geom
 
+
+
 /**
  * The MIT License (MIT)
  *
@@ -47,56 +49,56 @@ class Rectangle
  */(
 	/**
 	 * - 矩形左上角的 x 坐标。
-	 * @default 0.0
+	 * @default 0f
 	 * @version DragonBones 3.0
 	 * @language zh_CN
 	 */
 	/**
 	 * - The x coordinate of the top-left corner of the rectangle.
-	 * @default 0.0
+	 * @default 0f
 	 * @version DragonBones 3.0
 	 * @language en_US
 	 */
-	var x: Double = 0.0,
+	var x: Float = 0f,
 	/**
 	 * - 矩形左上角的 y 坐标。
-	 * @default 0.0
+	 * @default 0f
 	 * @version DragonBones 3.0
 	 * @language zh_CN
 	 */
 	/**
 	 * - The y coordinate of the top-left corner of the rectangle.
-	 * @default 0.0
+	 * @default 0f
 	 * @version DragonBones 3.0
 	 * @language en_US
 	 */
-	var y: Double = 0.0,
+	var y: Float = 0f,
 	/**
 	 * - 矩形的宽度（以像素为单位）。
-	 * @default 0.0
+	 * @default 0f
 	 * @version DragonBones 3.0
 	 * @language zh_CN
 	 */
 	/**
 	 * - The width of the rectangle, in pixels.
-	 * @default 0.0
+	 * @default 0f
 	 * @version DragonBones 3.0
 	 * @language en_US
 	 */
-	var width: Double = 0.0,
+	var width: Float = 0f,
 	/**
 	 * - The height of the rectangle, in pixels.
-	 * @default 0.0
+	 * @default 0f
 	 * @version DragonBones 3.0
 	 * @language zh_CN
 	 */
 	/**
 	 * - 矩形的高度（以像素为单位）。
-	 * @default 0.0
+	 * @default 0f
 	 * @version DragonBones 3.0
 	 * @language en_US
 	 */
-	var height: Double = 0.0
+	var height: Float = 0f
 ) {
 	/**
 	 * @private
@@ -112,9 +114,15 @@ class Rectangle
 	 * @private
 	 */
 	fun clear() {
-		this.x = 0.0
-		this.y = 0.0
-		this.width = 0.0
-		this.height = 0.0
+		this.x = 0f
+		this.y = 0f
+		this.width = 0f
+		this.height = 0f
 	}
 }
+
+/*
+fun Rectangle.clear() {
+	setTo(0f, 0f, 0f, 0f)
+}
+*/

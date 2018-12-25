@@ -708,7 +708,7 @@ open class TagDefineFont : _BaseTag(), IDefinitionTag {
 	override val version = 1
 	override val level = 1
 
-	protected open val unitDivisor = 1.0
+	protected open val unitDivisor = 1.0f
 
 	override fun toString(indent: Int, flags: Int): String {
 		val str: String = Tag.toStringCommon(type, name, indent) +
@@ -873,7 +873,7 @@ class TagDefineFont3 : TagDefineFont2(), IDefinitionTag {
 	override val version = 8
 	override val level = 2
 
-	override val unitDivisor = 20.0
+	override val unitDivisor = 20f
 
 	override fun toString(indent: Int, flags: Int): String {
 		val str: String = Tag.toStringCommon(type, name, indent) +
@@ -1119,7 +1119,7 @@ open class TagDefineMorphShape : _BaseTag(), IDefinitionTag {
 		endEdges = data.readSHAPE()
 	}
 
-	fun export(handler: ShapeExporter, ratio: Double = 0.0): Unit {
+	fun export(handler: ShapeExporter, ratio: Float = 0f): Unit {
 		var j = 0
 		val exportShape = SWFShape()
 		val numEdges: Int = startEdges.records.size
@@ -2256,6 +2256,7 @@ open class TagPlaceObject : _BaseTag(), IDisplayListTag {
 
 	// Forward declarations for TagPlaceObject2
 	var ratio = 0
+	val ratiof get() = ratio.toFloat() / 65536f
 	val ratiod get() = ratio.toDouble() / 65536.0
 	var instanceName: String? = null
 	var clipDepth = 0

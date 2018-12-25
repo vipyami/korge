@@ -9,8 +9,8 @@ class DockingComponent(override val view: View, var anchor: Anchor) : ResizeComp
 	//private val bounds = Rectangle()
 
 	override fun resized(views: Views, width: Int, height: Int) {
-		view.x = views.actualVirtualLeft.toDouble() + (views.actualVirtualWidth) * anchor.sx
-		view.y = views.actualVirtualTop.toDouble() + (views.actualVirtualHeight) * anchor.sy
+		view.x = views.actualVirtualLeft.toFloat() + (views.actualVirtualWidth) * anchor.sx
+		view.y = views.actualVirtualTop.toFloat() + (views.actualVirtualHeight) * anchor.sy
 		view.invalidate()
 		view.parent?.invalidate()
 	}

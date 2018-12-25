@@ -63,16 +63,16 @@ abstract class BoundingBoxData(pool: BaseObjectPool) : BaseObject(pool) {
 	/**
 	 * @private
 	 */
-	var width: Double = 0.0
+	var width: Float = 0f
 	/**
 	 * @private
 	 */
-	var height: Double = 0.0
+	var height: Float = 0f
 
 	override fun _onClear(): Unit {
 		this.color = 0x000000
-		this.width = 0.0
-		this.height = 0.0
+		this.width = 0f
+		this.height = 0f
 	}
 	/**
 	 * - Check whether the bounding box contains a specific point. (Local coordinate system)
@@ -84,7 +84,7 @@ abstract class BoundingBoxData(pool: BaseObjectPool) : BaseObject(pool) {
 	 * @version DragonBones 5.0
 	 * @language zh_CN
 	 */
-	abstract fun containsPoint(pX: Double, pY: Double): Boolean
+	abstract fun containsPoint(pX: Float, pY: Float): Boolean
 	/**
 	 * - Check whether the bounding box intersects a specific segment. (Local coordinate system)
 	 * @version DragonBones 5.0
@@ -96,7 +96,7 @@ abstract class BoundingBoxData(pool: BaseObjectPool) : BaseObject(pool) {
 	 * @language zh_CN
 	 */
 	abstract fun intersectsSegment(
-		xA: Double, yA: Double, xB: Double, yB: Double,
+		xA: Float, yA: Float, xB: Float, yB: Float,
 		intersectionPointA: Point? = null,
 		intersectionPointB: Point? = null,
 		normalRadians: Point? = null
@@ -147,7 +147,7 @@ class RectangleBoundingBoxData(pool: BaseObjectPool) : BoundingBoxData(pool) {
 		/**
 		 * - Compute the bit code for a point (x, y) using the clip rectangle
 		 */
-		private fun _computeOutCode(x: Double, y: Double, xMin: Double, yMin: Double, xMax: Double, yMax: Double): Int {
+		private fun _computeOutCode(x: Float, y: Float, xMin: Float, yMin: Float, xMax: Float, yMax: Float): Int {
 			var code = OutCode.InSide  // initialised as being inside of [[clip window]]
 
 			if (x < xMin) {             // to the left of clip window
@@ -169,8 +169,8 @@ class RectangleBoundingBoxData(pool: BaseObjectPool) : BoundingBoxData(pool) {
 		 * @private
 		 */
 		fun rectangleIntersectsSegment(
-			xA: Double, yA: Double, xB: Double, yB: Double,
-			xMin: Double, yMin: Double, xMax: Double, yMax: Double,
+			xA: Float, yA: Float, xB: Float, yB: Float,
+			xMin: Float, yMin: Float, xMax: Float, yMax: Float,
 			intersectionPointA:
 			Point? = null,
 			intersectionPointB:
@@ -205,9 +205,9 @@ class RectangleBoundingBoxData(pool: BaseObjectPool) : BoundingBoxData(pool) {
 
 				// failed both tests, so calculate the line segment to clip
 				// from an outside point to an intersection with clip edge
-				var x = 0.0
-				var y = 0.0
-				var normalRadian = 0.0
+				var x = 0f
+				var y = 0f
+				var normalRadian = 0f
 
 				// At least one endpoint is outside the clip rectangle; pick it.
 				val outcodeOut = if (outcode0 != 0) outcode0 else outcode1
@@ -219,7 +219,7 @@ class RectangleBoundingBoxData(pool: BaseObjectPool) : BoundingBoxData(pool) {
 					y = yMin
 
 					if (normalRadians != null) {
-						normalRadian = -PI * 0.5
+						normalRadian = -PIf * 0.5f
 					}
 				} else if ((outcodeOut and OutCode.Bottom) != 0) {
 					// point is below the clip rectangle
@@ -227,7 +227,7 @@ class RectangleBoundingBoxData(pool: BaseObjectPool) : BoundingBoxData(pool) {
 					y = yMax
 
 					if (normalRadians != null) {
-						normalRadian = PI * 0.5
+						normalRadian = PIf * 0.5f
 					}
 				} else if ((outcodeOut and OutCode.Right) != 0) {
 					// point is to the right of clip rectangle
@@ -235,7 +235,7 @@ class RectangleBoundingBoxData(pool: BaseObjectPool) : BoundingBoxData(pool) {
 					x = xMax
 
 					if (normalRadians != null) {
-						normalRadian = 0.0
+						normalRadian = 0f
 					}
 				} else if ((outcodeOut and OutCode.Left) != 0) {
 					// point is to the left of clip rectangle
@@ -243,7 +243,7 @@ class RectangleBoundingBoxData(pool: BaseObjectPool) : BoundingBoxData(pool) {
 					x = xMin
 
 					if (normalRadians != null) {
-						normalRadian = PI
+						normalRadian = PIf
 					}
 				}
 
@@ -328,7 +328,7 @@ class RectangleBoundingBoxData(pool: BaseObjectPool) : BoundingBoxData(pool) {
 	/**
 	 * @inheritDoc
 	 */
-	override fun containsPoint(pX: Double, pY: Double): Boolean {
+	override fun containsPoint(pX: Float, pY: Float): Boolean {
 		val widthH = this.width * 0.5
 		if (pX >= -widthH && pX <= widthH) {
 			val heightH = this.height * 0.5
@@ -344,13 +344,13 @@ class RectangleBoundingBoxData(pool: BaseObjectPool) : BoundingBoxData(pool) {
 	 * @inheritDoc
 	 */
 	override fun intersectsSegment(
-		xA: Double, yA: Double, xB: Double, yB: Double,
+		xA: Float, yA: Float, xB: Float, yB: Float,
 		intersectionPointA: Point?,
 		intersectionPointB: Point?,
 		normalRadians: Point?
 	): Int {
-		val widthH = this.width * 0.5
-		val heightH = this.height * 0.5
+		val widthH = this.width * 0.5f
+		val heightH = this.height * 0.5f
 		val intersectionCount = RectangleBoundingBoxData.rectangleIntersectsSegment(
 			xA, yA, xB, yB,
 			-widthH, -heightH, widthH, heightH,
@@ -380,8 +380,8 @@ class EllipseBoundingBoxData(pool: BaseObjectPool) : BoundingBoxData(pool) {
 		 * @private
 		 */
 		fun ellipseIntersectsSegment(
-			xA: Double, yA: Double, xB: Double, yB: Double,
-			xC: Double, yC: Double, widthH: Double, heightH: Double,
+			xA: Float, yA: Float, xB: Float, yB: Float,
+			xC: Float, yC: Float, widthH: Float, heightH: Float,
 			intersectionPointA: Point? = null,
 			intersectionPointB: Point? = null,
 			normalRadians: Point? = null
@@ -408,12 +408,12 @@ class EllipseBoundingBoxData(pool: BaseObjectPool) : BoundingBoxData(pool) {
 			val dR = rr - ee + aa
 			var intersectionCount = 0
 
-			if (dR >= 0.0) {
+			if (dR >= 0f) {
 				val dT = sqrt(dR)
 				val sA = a - dT
 				val sB = a + dT
-				val inSideA = if (sA < 0.0) -1 else if (sA <= lAB) 0 else 1
-				val inSideB = if (sB < 0.0) -1 else if (sB <= lAB) 0 else 1
+				val inSideA = if (sA < 0f) -1 else if (sA <= lAB) 0 else 1
+				val inSideB = if (sB < 0f) -1 else if (sB <= lAB) 0 else 1
 				val sideAB = inSideA * inSideB
 
 				if (sideAB < 0) {
@@ -494,11 +494,11 @@ class EllipseBoundingBoxData(pool: BaseObjectPool) : BoundingBoxData(pool) {
 	/**
 	 * @inheritDoc
 	 */
-	override fun containsPoint(pX: Double, pY: Double): Boolean {
+	override fun containsPoint(pX: Float, pY: Float): Boolean {
 		var pY = pY
-		val widthH = this.width * 0.5
+		val widthH = this.width * 0.5f
 		if (pX >= -widthH && pX <= widthH) {
-			val heightH = this.height * 0.5
+			val heightH = this.height * 0.5f
 			if (pY >= -heightH && pY <= heightH) {
 				pY *= widthH / heightH
 				return sqrt(pX * pX + pY * pY) <= widthH
@@ -512,14 +512,14 @@ class EllipseBoundingBoxData(pool: BaseObjectPool) : BoundingBoxData(pool) {
 	 * @inheritDoc
 	 */
 	override fun intersectsSegment(
-		xA: Double, yA: Double, xB: Double, yB: Double,
+		xA: Float, yA: Float, xB: Float, yB: Float,
 		intersectionPointA: Point?,
 		intersectionPointB: Point?,
 		normalRadians: Point?
 	): Int {
 		val intersectionCount = EllipseBoundingBoxData.ellipseIntersectsSegment(
 			xA, yA, xB, yB,
-			0.0, 0.0, this.width * 0.5, this.height * 0.5,
+			0f, 0f, this.width * 0.5f, this.height * 0.5f,
 			intersectionPointA, intersectionPointB, normalRadians
 		)
 
@@ -545,55 +545,55 @@ class PolygonBoundingBoxData(pool: BaseObjectPool) : BoundingBoxData(pool) {
 	 * @private
 	 */
 	fun polygonIntersectsSegment(
-		xA: Double, yA: Double, xB: Double, yB: Double,
-		vertices: DoubleArray,
+		xA: Float, yA: Float, xB: Float, yB: Float,
+		vertices: FloatArray,
 		intersectionPointA: Point? = null,
 		intersectionPointB: Point? = null,
 		normalRadians: Point? = null
 	): Int {
 		var xA = xA
 		var yA = yA
-		if (xA == xB) xA = xB + 0.000001
-		if (yA == yB) yA = yB + 0.000001
+		if (xA == xB) xA = xB + 0.000001f
+		if (yA == yB) yA = yB + 0.000001f
 
 		val count = vertices.size
 		val dXAB = xA - xB
 		val dYAB = yA - yB
 		val llAB = xA * yB - yA * xB
 		var intersectionCount = 0
-		var xC = vertices[count - 2].toDouble()
-		var yC = vertices[count - 1].toDouble()
-		var dMin = 0.0
-		var dMax = 0.0
-		var xMin = 0.0
-		var yMin = 0.0
-		var xMax = 0.0
-		var yMax = 0.0
+		var xC = vertices[count - 2]
+		var yC = vertices[count - 1]
+		var dMin = 0f
+		var dMax = 0f
+		var xMin = 0f
+		var yMin = 0f
+		var xMax = 0f
+		var yMax = 0f
 
 		for (i in 0 until count step 2) {
-			val xD = vertices[i + 0].toDouble()
-			val yD = vertices[i + 1].toDouble()
+			val xD = vertices[i + 0]
+			val yD = vertices[i + 1]
 
 			if (xC == xD) {
-				xC = xD + 0.0001
+				xC = xD + 0.0001f
 			}
 
 			if (yC == yD) {
-				yC = yD + 0.0001
+				yC = yD + 0.0001f
 			}
 
-			val dXCD = xC - xD
-			val dYCD = yC - yD
-			val llCD = xC * yD - yC * xD
-			val ll = dXAB * dYCD - dYAB * dXCD
-			val x = (llAB * dXCD - dXAB * llCD) / ll
+			val dXCD: Float = xC - xD
+			val dYCD: Float = yC - yD
+			val llCD: Float = xC * yD - yC * xD
+			val ll: Float = dXAB * dYCD - dYAB * dXCD
+			val x: Float = (llAB * dXCD - dXAB * llCD) / ll
 
-			if (((x >= xC && x <= xD) || (x >= xD && x <= xC)) && (dXAB == 0.0 || (x >= xA && x <= xB) || (x >= xB && x <= xA))) {
+			if (((x >= xC && x <= xD) || (x >= xD && x <= xC)) && (dXAB == 0f || (x >= xA && x <= xB) || (x >= xB && x <= xA))) {
 				val y = (llAB * dYCD - dYAB * llCD) / ll
-				if (((y >= yC && y <= yD) || (y >= yD && y <= yC)) && (dYAB == 0.0 || (y >= yA && y <= yB) || (y >= yB && y <= yA))) {
+				if (((y >= yC && y <= yD) || (y >= yD && y <= yC)) && (dYAB == 0f || (y >= yA && y <= yB) || (y >= yB && y <= yA))) {
 					if (intersectionPointB != null) {
 						var d = x - xA
-						if (d < 0.0) {
+						if (d < 0f) {
 							d = -d
 						}
 
@@ -654,13 +654,13 @@ class PolygonBoundingBoxData(pool: BaseObjectPool) : BoundingBoxData(pool) {
 
 		if (intersectionCount == 1) {
 			if (intersectionPointA != null) {
-				intersectionPointA.x = xMin.toFloat()
-				intersectionPointA.y = yMin.toFloat()
+				intersectionPointA.x = xMin
+				intersectionPointA.y = yMin
 			}
 
 			if (intersectionPointB != null) {
-				intersectionPointB.x = xMin.toFloat()
-				intersectionPointB.y = yMin.toFloat()
+				intersectionPointB.x = xMin
+				intersectionPointB.y = yMin
 			}
 
 			if (normalRadians != null) {
@@ -670,13 +670,13 @@ class PolygonBoundingBoxData(pool: BaseObjectPool) : BoundingBoxData(pool) {
 			intersectionCount++
 
 			if (intersectionPointA != null) {
-				intersectionPointA.x = xMin.toFloat()
-				intersectionPointA.y = yMin.toFloat()
+				intersectionPointA.x = xMin
+				intersectionPointA.y = yMin
 			}
 
 			if (intersectionPointB != null) {
-				intersectionPointB.x = xMax.toFloat()
-				intersectionPointB.y = yMax.toFloat()
+				intersectionPointB.x = xMax
+				intersectionPointB.y = yMax
 			}
 		}
 
@@ -686,11 +686,11 @@ class PolygonBoundingBoxData(pool: BaseObjectPool) : BoundingBoxData(pool) {
 	/**
 	 * @private
 	 */
-	var x: Double = 0.0
+	var x: Float = 0f
 	/**
 	 * @private
 	 */
-	var y: Double = 0.0
+	var y: Float = 0f
 	/**
 	 * - The polygon vertices.
 	 * @version DragonBones 5.1
@@ -701,21 +701,21 @@ class PolygonBoundingBoxData(pool: BaseObjectPool) : BoundingBoxData(pool) {
 	 * @version DragonBones 5.1
 	 * @language zh_CN
 	 */
-	var vertices: DoubleArray = DoubleArray(0)
+	var vertices: FloatArray = FloatArray(0)
 
 	override fun _onClear(): Unit {
 		super._onClear()
 
 		this.type = BoundingBoxType.Polygon
-		this.x = 0.0
-		this.y = 0.0
-		this.vertices = DoubleArray(0)
+		this.x = 0f
+		this.y = 0f
+		this.vertices = FloatArray(0)
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	override fun containsPoint(pX: Double, pY: Double): Boolean {
+	override fun containsPoint(pX: Float, pY: Float): Boolean {
 		var isInSide = false
 		if (pX >= this.x && pX <= this.width && pY >= this.y && pY <= this.height) {
 			var iP = this.vertices.size - 2
@@ -741,7 +741,7 @@ class PolygonBoundingBoxData(pool: BaseObjectPool) : BoundingBoxData(pool) {
 	 * @inheritDoc
 	 */
 	override fun intersectsSegment(
-		xA: Double, yA: Double, xB: Double, yB: Double,
+		xA: Float, yA: Float, xB: Float, yB: Float,
 		intersectionPointA: Point?,
 		intersectionPointB: Point?,
 		normalRadians: Point?

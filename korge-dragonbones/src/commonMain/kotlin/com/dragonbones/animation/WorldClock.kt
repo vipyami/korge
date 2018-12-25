@@ -55,18 +55,18 @@ class WorldClock : IAnimatable {
 	/**
 	 * - The play speed, used to control animation speed-shift play.
 	 * [0: Stop play, (0~1): Slow play, 1: Normal play, (1~N): Fast play]
-	 * @default 1.0
+	 * @default 1f
 	 * @version DragonBones 3.0
 	 * @language en_US
 	 */
 	/**
 	 * - 播放速度，用于控制动画变速播放。
 	 * [0: 停止播放, (0~1): 慢速播放, 1: 正常播放, (1~N): 快速播放]
-	 * @default 1.0
+	 * @default 1f
 	 * @version DragonBones 3.0
 	 * @language zh_CN
 	 */
-	var timeScale: Double = 1.0
+	var timeScale: Float = 1f
 
 	private var _systemTime: DateTime = DateTime.EPOCH
 	private val _animatebles: ArrayList<IAnimatable?> = arrayListOf()
@@ -99,7 +99,7 @@ class WorldClock : IAnimatable {
 	 * @version DragonBones 3.0
 	 * @language zh_CN
 	 */
-	override fun advanceTime(passedTime: Double): Unit {
+	override fun advanceTime(passedTime: Float): Unit {
 		var passedTime = passedTime.seconds
 		if (passedTime != passedTime) {
 			passedTime = 0.seconds
@@ -113,8 +113,8 @@ class WorldClock : IAnimatable {
 
 		this._systemTime = currentTime
 
-		if (this.timeScale != 1.0) {
-			passedTime *= this.timeScale
+		if (this.timeScale != 1f) {
+			passedTime *= this.timeScale.toDouble()
 		}
 
 		if (passedTime == 0.seconds) {
@@ -137,7 +137,7 @@ class WorldClock : IAnimatable {
 					this._animatebles[i] = null
 				}
 
-				animatable.advanceTime(passedTime.seconds)
+				animatable.advanceTime(passedTime.seconds.toFloat())
 			}
 			else {
 				r++

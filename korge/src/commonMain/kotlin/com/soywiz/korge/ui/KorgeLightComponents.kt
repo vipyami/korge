@@ -29,10 +29,10 @@ class KorgeLightComponents(val uiFactory: UIFactory) : LightComponents() {
 
 	override fun setBounds(c: Any, x: Int, y: Int, width: Int, height: Int) {
 		val view = c as View
-		view.x = x.toDouble()
-		view.y = y.toDouble()
-		view.width = width.toDouble()
-		view.height = height.toDouble()
+		view.x = x.toFloat()
+		view.y = y.toFloat()
+		view.width = width.toFloat()
+		view.height = height.toFloat()
 	}
 
 	override fun <T> setProperty(c: Any, key: LightProperty<T>, value: T) {

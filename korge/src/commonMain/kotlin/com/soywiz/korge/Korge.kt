@@ -132,8 +132,8 @@ object Korge {
 	fun prepareViews(views: Views, eventDispatcher: EventDispatcher, clearEachFrame: Boolean = true, bgcolor: RGBA = Colors.TRANSPARENT_BLACK, fixedSizeStep: TimeSpan = TimeSpan.NULL) {
 		val input = views.input
 		val ag = views.ag
-		val downPos = MPoint2d()
-		val upPos = MPoint2d()
+		val downPos = Point()
+		val upPos = Point()
 		var downTime = DateTime.EPOCH
 		var moveTime = DateTime.EPOCH
 		var upTime = DateTime.EPOCH
@@ -167,12 +167,12 @@ object Korge {
 		//agInput.onMouseClick { e -> } // Triggered by mouseUp
 		*/
 
-		fun pixelRatio(): Double = ag.devicePixelRatio
+		fun pixelRatio(): Float = ag.devicePixelRatio.toFloat()
 
-		fun getRealX(x: Double, scaleCoords: Boolean) = if (scaleCoords) x * pixelRatio() else x
-		fun getRealY(y: Double, scaleCoords: Boolean) = if (scaleCoords) y * pixelRatio() else y
+		fun getRealX(x: Float, scaleCoords: Boolean): Float = if (scaleCoords) x * pixelRatio() else x
+		fun getRealY(y: Float, scaleCoords: Boolean): Float = if (scaleCoords) y * pixelRatio() else y
 
-		fun updateTouch(id: Int, x: Double, y: Double, start: Boolean, end: Boolean) {
+		fun updateTouch(id: Int, x: Float, y: Float, start: Boolean, end: Boolean) {
 			val touch = input.getTouch(id)
 			val now = DateTime.now()
 
@@ -190,7 +190,7 @@ object Korge {
 			input.updateTouches()
 		}
 
-		fun mouseDown(type: String, x: Double, y: Double) {
+		fun mouseDown(type: String, x: Float, y: Float) {
 			views.input.mouseButtons = 1
 			views.input.mouse.setTo(x, y)
 			views.mouseUpdated()
@@ -198,7 +198,7 @@ object Korge {
 			downTime = DateTime.now()
 		}
 
-		fun mouseUp(type: String, x: Double, y: Double) {
+		fun mouseUp(type: String, x: Float, y: Float) {
 			//Console.log("mouseUp: $name")
 			views.input.mouseButtons = 0
 			views.input.mouse.setTo(x, y)
@@ -214,13 +214,13 @@ object Korge {
 			}
 		}
 
-		fun mouseDrag(type: String, x: Double, y: Double) {
+		fun mouseDrag(type: String, x: Float, y: Float) {
 			views.input.mouse.setTo(x, y)
 			views.mouseUpdated()
 			moveTime = DateTime.now()
 		}
 
-		fun mouseMove(type: String, x: Double, y: Double) {
+		fun mouseMove(type: String, x: Float, y: Float) {
 			views.input.mouse.setTo(x, y)
 			views.mouseUpdated()
 			moveTime = DateTime.now()
@@ -228,8 +228,8 @@ object Korge {
 
 		eventDispatcher.addEventListener<MouseEvent> { e ->
 			logger.trace { "eventDispatcher.addEventListener<MouseEvent>:$e" }
-			val x = getRealX(e.x.toDouble(), e.scaleCoords)
-			val y = getRealY(e.y.toDouble(), e.scaleCoords)
+			val x: Float = getRealX(e.x.toFloat(), e.scaleCoords)
+			val y: Float = getRealY(e.y.toFloat(), e.scaleCoords)
 			when (e.type) {
 				MouseEvent.Type.DOWN -> {
 					mouseDown("mouseDown", x, y)

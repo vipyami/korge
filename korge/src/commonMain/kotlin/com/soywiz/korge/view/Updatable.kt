@@ -1,5 +1,7 @@
 package com.soywiz.korge.view
 
+import com.soywiz.klock.*
+
 interface Updatable {
-	fun update(dtMs: Int): Unit
+	fun update(time: TimeSpan): Unit
 }

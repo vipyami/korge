@@ -178,7 +178,7 @@ class EventObject(pool: BaseObjectPool) : BaseObject(pool) {
 	 * @version DragonBones 4.5
 	 * @language zh_CN
 	 */
-	var time: Double = 0.0
+	var time: Float = 0f
 	/**
 	 * - The event type。
 	 * @version DragonBones 4.5
@@ -275,7 +275,7 @@ class EventObject(pool: BaseObjectPool) : BaseObject(pool) {
 	var data: UserData? = null
 
 	override fun _onClear() {
-		this.time = 0.0
+		this.time = 0f
 		this.type = ""
 		this.name = ""
 		//this.armature = null

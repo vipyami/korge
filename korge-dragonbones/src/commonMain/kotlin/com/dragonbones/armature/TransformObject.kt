@@ -27,6 +27,7 @@ package com.dragonbones.armature
 import com.dragonbones.core.*
 import com.dragonbones.geom.*
 
+
 /**
  * - The base class of the transform object.
  * @see dragonBones.Transform
@@ -93,11 +94,11 @@ abstract class TransformObject(pool: BaseObjectPool) : BaseObject(pool) {
 	/**
 	 * @internal
 	 */
-	var _alpha: Double = 1.0
+	var _alpha: Float = 1f
 	/**
 	 * @internal
 	 */
-	var _globalAlpha: Double = 1.0
+	var _globalAlpha: Float = 1f
 	/**
 	 * @internal
 	 */
@@ -113,8 +114,8 @@ abstract class TransformObject(pool: BaseObjectPool) : BaseObject(pool) {
 		this.userData = null
 
 		this._globalDirty = false
-		this._alpha = 1.0
-		this._globalAlpha = 1.0
+		this._alpha = 1f
+		this._globalAlpha = 1f
 		//this._armature = null //
 		this._armature = null //
 	}

@@ -58,7 +58,7 @@ class ActionTimelineState(pool: BaseObjectPool) : TimelineState(pool) {
 				if (action.type == ActionType.Play) {
 					val eventObject = pool.borrowObject<EventObject>()
 					// eventObject.time = this._frameArray[frameOffset] * this._frameRateR; // Precision problem
-					eventObject.time = this._frameArray!![frameOffset].toDouble() / this._frameRate
+					eventObject.time = this._frameArray!![frameOffset].toFloat() / this._frameRate
 					eventObject.animationState = this._animationState!!
 					EventObject.actionDataToInstance(action, eventObject, this._armature!!)
 					this._armature!!._bufferAction(eventObject, true)
@@ -68,7 +68,7 @@ class ActionTimelineState(pool: BaseObjectPool) : TimelineState(pool) {
 					if (action.type == ActionType.Sound || eventDispatcher.hasDBEventListener(eventType)) {
 						val eventObject = pool.borrowObject<EventObject>()
 						// eventObject.time = this._frameArray[frameOffset] * this._frameRateR; // Precision problem
-						eventObject.time = this._frameArray!![frameOffset].toDouble() / this._frameRate
+						eventObject.time = this._frameArray!![frameOffset].toFloat() / this._frameRate
 						eventObject.animationState = this._animationState!!
 						EventObject.actionDataToInstance(action, eventObject, this._armature!!)
 						this._armature?.eventDispatcher?.queueEvent(eventObject)
@@ -81,7 +81,7 @@ class ActionTimelineState(pool: BaseObjectPool) : TimelineState(pool) {
 	override fun _onArriveAtFrame() {}
 	override fun _onUpdateFrame() {}
 
-	override fun update(passedTime: Double) {
+	override fun update(passedTime: Float) {
 		val prevState = this.playState
 		var prevPlayTimes = this.currentPlayTimes
 		val prevTime = this._currentTime
@@ -109,7 +109,7 @@ class ActionTimelineState(pool: BaseObjectPool) : TimelineState(pool) {
 				}
 			}
 
-			val isReverse = this._animationState!!.timeScale < 0.0
+			val isReverse = this._animationState!!.timeScale < 0f
 			var loopCompleteEvent: EventObject? = null
 			var completeEvent: EventObject? = null
 
@@ -272,7 +272,7 @@ class ActionTimelineState(pool: BaseObjectPool) : TimelineState(pool) {
 		}
 	}
 
-	fun setCurrentTime(value: Double) {
+	fun setCurrentTime(value: Float) {
 		this._setCurrentTime(value)
 		this._frameIndex = -1
 	}
@@ -312,13 +312,13 @@ class BoneAllTimelineState(pool: BaseObjectPool) : MutilpleValueTimelineState(po
 		super._onArriveAtFrame()
 
 		if (this._isTween && this._frameIndex == this._frameCount - 1) {
-			this._rd[2] = Transform.normalizeRadian(this._rd[2])
-			this._rd[3] = Transform.normalizeRadian(this._rd[3])
+			this._rd[2] = normalizeRadian(this._rd[2])
+			this._rd[3] = normalizeRadian(this._rd[3])
 		}
 
 		if (this._timelineData == null) { // Pose.
-			this._rd[4] = 1.0
-			this._rd[5] = 1.0
+			this._rd[4] = 1f
+			this._rd[5] = 1f
 		}
 	}
 
@@ -332,8 +332,8 @@ class BoneAllTimelineState(pool: BaseObjectPool) : MutilpleValueTimelineState(po
 
 	override fun fadeOut() {
 		this.dirty = false
-		this._rd[2] = Transform.normalizeRadian(this._rd[2])
-		this._rd[3] = Transform.normalizeRadian(this._rd[3])
+		this._rd[2] = normalizeRadian(this._rd[2])
+		this._rd[3] = normalizeRadian(this._rd[3])
 	}
 
 	override fun blend(_isDirty: Boolean) {
@@ -350,15 +350,15 @@ class BoneAllTimelineState(pool: BaseObjectPool) : MutilpleValueTimelineState(po
 			result.y += (rd[1] * blendWeight * valueScale).toFloat()
 			result.rotation += (rd[2] * blendWeight).toFloat()
 			result.skew += (rd[3] * blendWeight).toFloat()
-			result.scaleX += ((rd[4] - 1.0) * blendWeight).toFloat()
-			result.scaleY += ((rd[5] - 1.0) * blendWeight).toFloat()
+			result.scaleX += ((rd[4] - 1f) * blendWeight).toFloat()
+			result.scaleY += ((rd[5] - 1f) * blendWeight).toFloat()
 		} else {
 			result.x = (rd[0] * blendWeight * valueScale).toFloat()
 			result.y = (rd[1] * blendWeight * valueScale).toFloat()
 			result.rotation = (rd[2] * blendWeight).toFloat()
 			result.skew = (rd[3] * blendWeight).toFloat()
-			result.scaleX = ((rd[4] - 1.0) * blendWeight + 1.0).toFloat() //
-			result.scaleY = ((rd[5] - 1.0) * blendWeight + 1.0).toFloat() //
+			result.scaleX = ((rd[4] - 1f) * blendWeight + 1f).toFloat() //
+			result.scaleY = ((rd[5] - 1f) * blendWeight + 1f).toFloat() //
 		}
 
 		if (_isDirty || this.dirty) {
@@ -371,7 +371,7 @@ class BoneAllTimelineState(pool: BaseObjectPool) : MutilpleValueTimelineState(po
 /**
  * @internal
  */
-class BoneTranslateTimelineState(pool: BaseObjectPool) : DoubleValueTimelineState(pool) {
+class BoneTranslateTimelineState(pool: BaseObjectPool) : FloatValueTimelineState(pool) {
 	override fun toString(): String {
 		return "[class dragonBones.BoneTranslateTimelineState]"
 	}
@@ -395,7 +395,7 @@ class BoneTranslateTimelineState(pool: BaseObjectPool) : DoubleValueTimelineStat
 				result.x += (this._resultA * blendWeight).toFloat()
 				result.y += (this._resultB * blendWeight).toFloat()
 			}
-			blendWeight != 1.0 -> {
+			blendWeight != 1f -> {
 				result.x = (this._resultA * blendWeight).toFloat()
 				result.y = (this._resultB * blendWeight).toFloat()
 			}
@@ -415,7 +415,7 @@ class BoneTranslateTimelineState(pool: BaseObjectPool) : DoubleValueTimelineStat
 /**
  * @internal
  */
-class BoneRotateTimelineState(pool: BaseObjectPool) : DoubleValueTimelineState(pool) {
+class BoneRotateTimelineState(pool: BaseObjectPool) : FloatValueTimelineState(pool) {
 	override fun toString(): String {
 		return "[class dragonBones.BoneRotateTimelineState]"
 	}
@@ -424,8 +424,8 @@ class BoneRotateTimelineState(pool: BaseObjectPool) : DoubleValueTimelineState(p
 		super._onArriveAtFrame()
 
 		if (this._isTween && this._frameIndex == this._frameCount - 1) {
-			this._differenceA = Transform.normalizeRadian(this._differenceA)
-			this._differenceB = Transform.normalizeRadian(this._differenceB)
+			this._differenceA = normalizeRadian(this._differenceA)
+			this._differenceB = normalizeRadian(this._differenceB)
 		}
 	}
 
@@ -438,8 +438,8 @@ class BoneRotateTimelineState(pool: BaseObjectPool) : DoubleValueTimelineState(p
 
 	override fun fadeOut() {
 		this.dirty = false
-		this._resultA = Transform.normalizeRadian(this._resultA)
-		this._resultB = Transform.normalizeRadian(this._resultB)
+		this._resultA = normalizeRadian(this._resultA)
+		this._resultB = normalizeRadian(this._resultB)
 	}
 
 	override fun blend(_isDirty: Boolean) {
@@ -453,7 +453,7 @@ class BoneRotateTimelineState(pool: BaseObjectPool) : DoubleValueTimelineState(p
 				result.rotation += (this._resultA * blendWeight).toFloat()
 				result.skew += (this._resultB * blendWeight).toFloat()
 			}
-			blendWeight != 1.0 -> {
+			blendWeight != 1f -> {
 				result.rotation = (this._resultA * blendWeight).toFloat()
 				result.skew = (this._resultB * blendWeight).toFloat()
 			}
@@ -473,7 +473,7 @@ class BoneRotateTimelineState(pool: BaseObjectPool) : DoubleValueTimelineState(p
 /**
  * @internal
  */
-class BoneScaleTimelineState(pool: BaseObjectPool) : DoubleValueTimelineState(pool) {
+class BoneScaleTimelineState(pool: BaseObjectPool) : FloatValueTimelineState(pool) {
 	override fun toString(): String {
 		return "[class dragonBones.BoneScaleTimelineState]"
 	}
@@ -482,8 +482,8 @@ class BoneScaleTimelineState(pool: BaseObjectPool) : DoubleValueTimelineState(po
 		super._onArriveAtFrame()
 
 		if (this._timelineData == null) { // Pose.
-			this._resultA = 1.0
-			this._resultB = 1.0
+			this._resultA = 1f
+			this._resultB = 1f
 		}
 	}
 
@@ -502,12 +502,12 @@ class BoneScaleTimelineState(pool: BaseObjectPool) : DoubleValueTimelineState(po
 
 		when {
 			blendState.dirty > 1 -> {
-				result.scaleX += ((this._resultA - 1.0) * blendWeight).toFloat()
-				result.scaleY += ((this._resultB - 1.0) * blendWeight).toFloat()
+				result.scaleX += ((this._resultA - 1f) * blendWeight).toFloat()
+				result.scaleY += ((this._resultB - 1f) * blendWeight).toFloat()
 			}
-			blendWeight != 1.0 -> {
-				result.scaleX = ((this._resultA - 1.0) * blendWeight + 1.0).toFloat()
-				result.scaleY = ((this._resultB - 1.0) * blendWeight + 1.0).toFloat()
+			blendWeight != 1f -> {
+				result.scaleX = ((this._resultA - 1f) * blendWeight + 1f).toFloat()
+				result.scaleY = ((this._resultB - 1f) * blendWeight + 1f).toFloat()
 			}
 			else -> {
 				result.scaleX = this._resultA.toFloat()
@@ -558,7 +558,7 @@ class SurfaceTimelineState(pool: BaseObjectPool) : MutilpleValueTimelineState(po
 					this._animationData!!.frameFloatOffset
 			this._valueScale = this._armature!!.armatureData.scale
 			this._valueArray = dragonBonesData.frameFloatArray!!
-			this._rd = DoubleArray(this._valueCount * 2)
+			this._rd = FloatArray(this._valueCount * 2)
 		} else {
 			this._deformCount = ((this.target as BlendState).target as Surface)._deformVertices.size
 		}
@@ -578,14 +578,14 @@ class SurfaceTimelineState(pool: BaseObjectPool) : MutilpleValueTimelineState(po
 			val rd = this._rd
 
 			for (i in 0 until this._deformCount) {
-				var value: Double
+				var value: Float
 
 				value = if (i < deformOffset) {
-					valueArray[sameValueOffset + i].toDouble()
+					valueArray[sameValueOffset + i].toFloat()
 				} else if (i < deformOffset + valueCount) {
 					rd[i - deformOffset]
 				} else {
-					valueArray[sameValueOffset + i - valueCount].toDouble()
+					valueArray[sameValueOffset + i - valueCount].toFloat()
 				}
 
 				if (blendState.dirty > 1) {
@@ -619,7 +619,7 @@ class AlphaTimelineState(pool: BaseObjectPool) : SingleValueTimelineState(pool) 
 		super._onArriveAtFrame()
 
 		if (this._timelineData == null) { // Pose.
-			this._result = 1.0
+			this._result = 1f
 		}
 	}
 
@@ -627,7 +627,7 @@ class AlphaTimelineState(pool: BaseObjectPool) : SingleValueTimelineState(pool) 
 		super.init(armature, animationState, timelineData)
 
 		this._valueOffset = this._animationData!!.frameIntOffset
-		this._valueScale = 0.01
+		this._valueScale = 0.01f
 		this._valueArray = this._animationData!!.parent!!.parent!!.frameIntArray!!.toFloat()
 	}
 
@@ -638,8 +638,8 @@ class AlphaTimelineState(pool: BaseObjectPool) : SingleValueTimelineState(pool) 
 
 		if (blendState.dirty > 1) {
 			alphaTarget._alpha += this._result * blendWeight
-			if (alphaTarget._alpha > 1.0) {
-				alphaTarget._alpha = 1.0
+			if (alphaTarget._alpha > 1f) {
+				alphaTarget._alpha = 1f
 			}
 		} else {
 			alphaTarget._alpha = this._result * blendWeight
@@ -686,7 +686,7 @@ class SlotColorTimelineState(pool: BaseObjectPool) : TweenTimelineState(pool) {
 
 	private val _current: IntArray = intArrayOf(0, 0, 0, 0, 0, 0, 0, 0)
 	private val _difference: IntArray = intArrayOf(0, 0, 0, 0, 0, 0, 0, 0)
-	private val _result: DoubleArray = doubleArrayOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+	private val _result: FloatArray = floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f)
 
 	@Suppress("UNUSED_CHANGED_VALUE")
 	override fun _onArriveAtFrame() {
@@ -732,14 +732,14 @@ class SlotColorTimelineState(pool: BaseObjectPool) : TweenTimelineState(pool) {
 				this._difference[6] = colorArray[colorOffset++] - this._current[6]
 				this._difference[7] = colorArray[colorOffset++] - this._current[7]
 			} else {
-				this._result[0] = colorArray[colorOffset++] * 0.01
-				this._result[1] = colorArray[colorOffset++] * 0.01
-				this._result[2] = colorArray[colorOffset++] * 0.01
-				this._result[3] = colorArray[colorOffset++] * 0.01
-				this._result[4] = colorArray[colorOffset++].toDouble()
-				this._result[5] = colorArray[colorOffset++].toDouble()
-				this._result[6] = colorArray[colorOffset++].toDouble()
-				this._result[7] = colorArray[colorOffset++].toDouble()
+				this._result[0] = colorArray[colorOffset++] * 0.01f
+				this._result[1] = colorArray[colorOffset++] * 0.01f
+				this._result[2] = colorArray[colorOffset++] * 0.01f
+				this._result[3] = colorArray[colorOffset++] * 0.01f
+				this._result[4] = colorArray[colorOffset++].toFloat()
+				this._result[5] = colorArray[colorOffset++].toFloat()
+				this._result[6] = colorArray[colorOffset++].toFloat()
+				this._result[7] = colorArray[colorOffset++].toFloat()
 			}
 		} else { // Pose.
 			val slot = this.target as Slot
@@ -748,10 +748,10 @@ class SlotColorTimelineState(pool: BaseObjectPool) : TweenTimelineState(pool) {
 			this._result[1] = color.redMultiplier
 			this._result[2] = color.greenMultiplier
 			this._result[3] = color.blueMultiplier
-			this._result[4] = color.alphaOffset.toDouble()
-			this._result[5] = color.redOffset.toDouble()
-			this._result[6] = color.greenOffset.toDouble()
-			this._result[7] = color.blueOffset.toDouble()
+			this._result[4] = color.alphaOffset.toFloat()
+			this._result[5] = color.redOffset.toFloat()
+			this._result[6] = color.greenOffset.toFloat()
+			this._result[7] = color.blueOffset.toFloat()
 		}
 	}
 
@@ -759,10 +759,10 @@ class SlotColorTimelineState(pool: BaseObjectPool) : TweenTimelineState(pool) {
 		super._onUpdateFrame()
 
 		if (this._isTween) {
-			this._result[0] = (this._current[0] + this._difference[0] * this._tweenProgress) * 0.01
-			this._result[1] = (this._current[1] + this._difference[1] * this._tweenProgress) * 0.01
-			this._result[2] = (this._current[2] + this._difference[2] * this._tweenProgress) * 0.01
-			this._result[3] = (this._current[3] + this._difference[3] * this._tweenProgress) * 0.01
+			this._result[0] = (this._current[0] + this._difference[0] * this._tweenProgress) * 0.01f
+			this._result[1] = (this._current[1] + this._difference[1] * this._tweenProgress) * 0.01f
+			this._result[2] = (this._current[2] + this._difference[2] * this._tweenProgress) * 0.01f
+			this._result[3] = (this._current[3] + this._difference[3] * this._tweenProgress) * 0.01f
 			this._result[4] = this._current[4] + this._difference[4] * this._tweenProgress
 			this._result[5] = this._current[5] + this._difference[5] * this._tweenProgress
 			this._result[6] = this._current[6] + this._difference[6] * this._tweenProgress
@@ -774,7 +774,7 @@ class SlotColorTimelineState(pool: BaseObjectPool) : TweenTimelineState(pool) {
 		this._isTween = false
 	}
 
-	override fun update(passedTime: Double) {
+	override fun update(passedTime: Float) {
 		super.update(passedTime)
 		// Fade animation.
 		if (this._isTween || this.dirty) {
@@ -792,7 +792,7 @@ class SlotColorTimelineState(pool: BaseObjectPool) : TweenTimelineState(pool) {
 					result.greenOffset != this._result[6].toInt() ||
 					result.blueOffset != this._result[7].toInt()
 				) {
-					val fadeProgress = pow(this._animationState!!._fadeProgress, 4.0)
+					val fadeProgress = pow(this._animationState!!._fadeProgress, 4f).toFloat()
 					result.alphaMultiplier += (this._result[0] - result.alphaMultiplier) * fadeProgress
 					result.redMultiplier += (this._result[1] - result.redMultiplier) * fadeProgress
 					result.greenMultiplier += (this._result[2] - result.greenMultiplier) * fadeProgress
@@ -845,7 +845,7 @@ class SlotZIndexTimelineState(pool: BaseObjectPool) : SingleValueTimelineState(p
 		if (this._timelineData == null) { // Pose.
 			val blendState = this.target as BlendState
 			val slot = blendState.target as Slot
-			this._result = slot.slotData.zIndex.toDouble()
+			this._result = slot.slotData.zIndex.toFloat()
 		}
 	}
 
@@ -941,7 +941,7 @@ class DeformTimelineState(pool: BaseObjectPool) : MutilpleValueTimelineState(poo
 					this._animationData!!.frameFloatOffset
 			this._valueScale = this._armature!!.armatureData.scale
 			this._valueArray = dragonBonesData.frameFloatArray!!
-			this._rd = DoubleArray(this._valueCount * 2)
+			this._rd = FloatArray(this._valueCount * 2)
 		} else {
 			this._deformCount = this.displayFrame!!.deformVertices.size
 		}
@@ -961,12 +961,10 @@ class DeformTimelineState(pool: BaseObjectPool) : MutilpleValueTimelineState(poo
 			val rd = this._rd
 
 			for (i in 0 until this._deformCount) {
-				var value: Double
-
-				value = when {
-					i < deformOffset -> valueArray[sameValueOffset + i].toDouble()
+				val value = when {
+					i < deformOffset -> valueArray[sameValueOffset + i]
 					i < deformOffset + valueCount -> rd[i - deformOffset]
-					else -> valueArray[sameValueOffset + i - valueCount].toDouble()
+					else -> valueArray[sameValueOffset + i - valueCount]
 				}
 
 				if (blendState.dirty > 1) {
@@ -978,7 +976,7 @@ class DeformTimelineState(pool: BaseObjectPool) : MutilpleValueTimelineState(poo
 		} else if (blendState.dirty == 1) {
 			//for (var i = 0; i < this._deformCount; ++i) {
 			for (i in 0 until this._deformCount) {
-				result[i] = 0.0
+				result[i] = 0f
 			}
 		}
 
@@ -995,7 +993,7 @@ class DeformTimelineState(pool: BaseObjectPool) : MutilpleValueTimelineState(poo
 /**
  * @internal
  */
-class IKConstraintTimelineState(pool: BaseObjectPool) : DoubleValueTimelineState(pool) {
+class IKConstraintTimelineState(pool: BaseObjectPool) : FloatValueTimelineState(pool) {
 	override fun toString(): String {
 		return "[class dragonBones.IKConstraintTimelineState]"
 	}
@@ -1006,7 +1004,7 @@ class IKConstraintTimelineState(pool: BaseObjectPool) : DoubleValueTimelineState
 		val ikConstraint = this.target as IKConstraint
 
 		if (this._timelineData != null) {
-			ikConstraint._bendPositive = this._currentA > 0.0
+			ikConstraint._bendPositive = this._currentA > 0f
 			ikConstraint._weight = this._currentB
 		} else {
 			val ikConstraintData = ikConstraint._constraintData as IKConstraintData
@@ -1022,7 +1020,7 @@ class IKConstraintTimelineState(pool: BaseObjectPool) : DoubleValueTimelineState
 		super.init(armature, animationState, timelineData)
 
 		this._valueOffset = this._animationData!!.frameIntOffset
-		this._valueScale = 0.01
+		this._valueScale = 0.01f
 		this._valueArray = this._animationData!!.parent!!.parent!!.frameIntArray!!.toFloat()
 	}
 }
@@ -1050,7 +1048,7 @@ class AnimationProgressTimelineState(pool: BaseObjectPool) : SingleValueTimeline
 		super.init(armature, animationState, timelineData)
 
 		this._valueOffset = this._animationData!!.frameIntOffset
-		this._valueScale = 0.0001
+		this._valueScale = 0.0001f
 		this._valueArray = this._animationData!!.parent!!.parent!!.frameIntArray!!.toFloat()
 	}
 }
@@ -1078,7 +1076,7 @@ class AnimationWeightTimelineState(pool: BaseObjectPool) : SingleValueTimelineSt
 		super.init(armature, animationState, timelineData)
 
 		this._valueOffset = this._animationData!!.frameIntOffset
-		this._valueScale = 0.0001
+		this._valueScale = 0.0001f
 		this._valueArray = this._animationData!!.parent!!.parent!!.frameIntArray!!.toFloat()
 	}
 }
@@ -1086,7 +1084,7 @@ class AnimationWeightTimelineState(pool: BaseObjectPool) : SingleValueTimelineSt
 /**
  * @internal
  */
-class AnimationParametersTimelineState(pool: BaseObjectPool) : DoubleValueTimelineState(pool) {
+class AnimationParametersTimelineState(pool: BaseObjectPool) : FloatValueTimelineState(pool) {
 	override fun toString(): String {
 		return "[class dragonBones.AnimationParametersTimelineState]"
 	}
@@ -1107,7 +1105,7 @@ class AnimationParametersTimelineState(pool: BaseObjectPool) : DoubleValueTimeli
 		super.init(armature, animationState, timelineData)
 
 		this._valueOffset = this._animationData!!.frameIntOffset
-		this._valueScale = 0.0001
+		this._valueScale = 0.0001f
 		this._valueArray = this._animationData!!.parent!!.parent!!.frameIntArray!!.toFloat()
 	}
 }

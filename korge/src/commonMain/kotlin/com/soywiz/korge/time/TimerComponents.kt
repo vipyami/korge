@@ -11,31 +11,29 @@ import kotlin.collections.plusAssign
 import kotlin.coroutines.*
 
 class TimerComponents(override val view: View) : UpdateComponent {
-	private val timers = arrayListOf<(Int) -> Unit>()
-	private val timersIt = arrayListOf<(Int) -> Unit>()
+	private val timers = arrayListOf<(TimeSpan) -> Unit>()
+	private val timersIt = arrayListOf<(TimeSpan) -> Unit>()
 
-	override fun update(ms: Double) {
+	override fun update(time: TimeSpan) {
 		timersIt.clear()
 		timersIt.addAll(timers)
-		for (timer in timersIt) timer(ms.toInt())
+		for (timer in timersIt) timer(time)
 	}
 
-	suspend fun wait(time: TimeSpan) = waitMilliseconds(time.milliseconds)
+	suspend fun waitFrame() = wait((1000.0 / 60.0).milliseconds)
 
-	suspend fun waitFrame() = waitMilliseconds(1000.0 / 60.0)
+	private var accumulated = 0.seconds
 
-	private var accumulated = 0.0
+	fun takeAccumulated() = accumulated.also { accumulated = 0.seconds }
+	fun incrAccumulated(time: TimeSpan) = run { accumulated += time }
 
-	fun takeAccumulated() = accumulated.also { accumulated = 0.0 }
-	fun incrAccumulated(time: Double) = run { accumulated += time }
-
-	suspend fun waitMilliseconds(time: Double): Unit = suspendCancellableCoroutine { c ->
-		waitMilliseconds(time) { c.resume(Unit) }
+	suspend fun wait(time: TimeSpan): Unit = suspendCancellableCoroutine { c ->
+		wait(time) { c.resume(Unit) }
 	}
 
-	fun waitMilliseconds(time: Double, callback: () -> Unit = {}): Closeable {
+	fun wait(time: TimeSpan, callback: () -> Unit = {}): Closeable {
 		var elapsedTime = takeAccumulated()
-		var timer: ((Int) -> Unit)? = null
+		var timer: ((TimeSpan) -> Unit)? = null
 		timer = {
 			elapsedTime += it
 			//println("TIMER: $elapsedTime")
@@ -52,14 +50,12 @@ class TimerComponents(override val view: View) : UpdateComponent {
 }
 
 val View.timers get() = this.getOrCreateComponent { TimerComponents(this) }
-suspend fun View.waitMs(time: Int) = this.timers.waitMilliseconds(time.toDouble())
 suspend fun View.wait(time: TimeSpan) = this.timers.wait(time)
 suspend fun View.waitFrame() = this.timers.waitFrame()
 
-suspend fun View.sleepMs(time: Int) = this.timers.waitMilliseconds(time.toDouble())
 suspend fun View.sleep(time: TimeSpan) = this.timers.wait(time)
 suspend fun View.sleepFrame() = this.timers.waitFrame()
 
 suspend fun View.delay(time: TimeSpan) = this.timers.wait(time)
 
-fun View.timer(time: TimeSpan, callback: () -> Unit): Closeable = this.timers.waitMilliseconds(time.milliseconds, callback)
+fun View.timer(time: TimeSpan, callback: () -> Unit): Closeable = this.timers.wait(time, callback)

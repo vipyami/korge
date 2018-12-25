@@ -51,22 +51,22 @@ class Animation(pool: BaseObjectPool) : BaseObject(pool) {
 	}
 	/**
 	 * - The play speed of all animations. [0: Stop, (0~1): Slow, 1: Normal, (1~N): Fast]
-	 * @default 1.0
+	 * @default 1f
 	 * @version DragonBones 3.0
 	 * @language en_US
 	 */
 	/**
 	 * - 所有动画的播放速度。 [0: 停止播放, (0~1): 慢速播放, 1: 正常播放, (1~N): 快速播放]
-	 * @default 1.0
+	 * @default 1f
 	 * @version DragonBones 3.0
 	 * @language zh_CN
 	 */
-	var timeScale: Double = 1.0
+	var timeScale: Float = 1f
 	/**
 	 * Update bones and slots cachedFrameIndices.
 	 */
 	private var _animationDirty: Boolean = false //
-	private var _inheritTimeScale: Double = 1.0
+	private var _inheritTimeScale: Float = 1f
 	private val _animationNames: ArrayList<String> = arrayListOf()
 	private val _animationStates: ArrayList<AnimationState> = arrayListOf()
 	private val _animations: FastStringMap<AnimationData> = FastStringMap()
@@ -91,10 +91,10 @@ class Animation(pool: BaseObjectPool) : BaseObject(pool) {
 
 		this._animationConfig?.returnToPool()
 
-		this.timeScale = 1.0
+		this.timeScale = 1f
 
 		this._animationDirty = false
-		this._inheritTimeScale = 1.0
+		this._inheritTimeScale = 1f
 		this._animationNames.clear()
 		this._animationStates.clear()
 		//this._animations.clear();
@@ -176,10 +176,10 @@ class Animation(pool: BaseObjectPool) : BaseObject(pool) {
 	/**
 	 * @internal
 	 */
-	fun advanceTime(passedTime: Double): Unit {
+	fun advanceTime(passedTime: Float): Unit {
 		//println(this.animationNames)
 		var passedTime = passedTime
-		if (passedTime < 0.0) { // Only animationState can reverse play.
+		if (passedTime < 0f) { // Only animationState can reverse play.
 			passedTime = -passedTime
 		}
 
@@ -190,7 +190,7 @@ class Animation(pool: BaseObjectPool) : BaseObject(pool) {
 			this._inheritTimeScale = this.timeScale
 		}
 
-		if (this._inheritTimeScale != 1.0) {
+		if (this._inheritTimeScale != 1f) {
 			passedTime *= this._inheritTimeScale
 		}
 
@@ -213,7 +213,7 @@ class Animation(pool: BaseObjectPool) : BaseObject(pool) {
 				val animationData = animationState.animationData
 				val cacheFrameRate = animationData.cacheFrameRate
 
-				if (this._animationDirty && cacheFrameRate > 0.0) { // Update cachedFrameIndices.
+				if (this._animationDirty && cacheFrameRate > 0f) { // Update cachedFrameIndices.
 					this._animationDirty = false
 
 					for (bone in this._armature!!.getBones()) {
@@ -259,7 +259,7 @@ class Animation(pool: BaseObjectPool) : BaseObject(pool) {
 						this._animationStates[i - r] = animationState
 					}
 
-					animationState.advanceTime(passedTime, 0.0)
+					animationState.advanceTime(passedTime, 0f)
 				}
 
 				if (i == animationStateCount - 1 && r > 0) { // Modify animation states size.
@@ -374,33 +374,33 @@ class Animation(pool: BaseObjectPool) : BaseObject(pool) {
 		}
 
 		if (this._animationStates.size == 0) {
-			animationConfig.fadeInTime = 0.0
+			animationConfig.fadeInTime = 0f
 		}
-		else if (animationConfig.fadeInTime < 0.0) {
+		else if (animationConfig.fadeInTime < 0f) {
 			animationConfig.fadeInTime = animationData.fadeInTime
 		}
 
-		if (animationConfig.fadeOutTime < 0.0) {
+		if (animationConfig.fadeOutTime < 0f) {
 			animationConfig.fadeOutTime = animationConfig.fadeInTime
 		}
 
-		if (animationConfig.timeScale <= -100.0) {
-			animationConfig.timeScale = 1.0 / animationData.scale
+		if (animationConfig.timeScale <= -100f) {
+			animationConfig.timeScale = 1f / animationData.scale
 		}
 
 		if (animationData.frameCount > 0) {
-			if (animationConfig.position < 0.0) {
+			if (animationConfig.position < 0f) {
 				animationConfig.position %= animationData.duration
 				animationConfig.position = animationData.duration - animationConfig.position
 			}
 			else if (animationConfig.position == animationData.duration) {
-				animationConfig.position -= 0.000001 // Play a little time before end.
+				animationConfig.position -= 0.000001f // Play a little time before end.
 			}
 			else if (animationConfig.position > animationData.duration) {
 				animationConfig.position %= animationData.duration
 			}
 
-			if (animationConfig.duration > 0.0 && animationConfig.position + animationConfig.duration > animationData.duration) {
+			if (animationConfig.duration > 0f && animationConfig.position + animationConfig.duration > animationData.duration) {
 				animationConfig.duration = animationData.duration - animationConfig.position
 			}
 
@@ -410,15 +410,15 @@ class Animation(pool: BaseObjectPool) : BaseObject(pool) {
 		}
 		else {
 			animationConfig.playTimes = 1
-			animationConfig.position = 0.0
+			animationConfig.position = 0f
 
-			if (animationConfig.duration > 0.0) {
-				animationConfig.duration = 0.0
+			if (animationConfig.duration > 0f) {
+				animationConfig.duration = 0f
 			}
 		}
 
-		if (animationConfig.duration == 0.0) {
-			animationConfig.duration = -1.0
+		if (animationConfig.duration == 0f) {
+			animationConfig.duration = -1f
 		}
 
 		this._fadeOut(animationConfig)
@@ -466,7 +466,7 @@ class Animation(pool: BaseObjectPool) : BaseObject(pool) {
 		}
 
 		for (k in animationData.animationTimelines.keys) { // Blend animation node.
-			val childAnimationState = this.fadeIn(k, 0.0, 1, animationState.layer, "", AnimationFadeOutMode.Single)
+			val childAnimationState = this.fadeIn(k, 0f, 1, animationState.layer, "", AnimationFadeOutMode.Single)
 					?: continue
 
 			val timelines = animationData.animationTimelines[k]
@@ -483,8 +483,8 @@ class Animation(pool: BaseObjectPool) : BaseObject(pool) {
 			}
 		}
 
-		// if (!this._armature._lockUpdate && animationConfig.fadeInTime <= 0.0) { // Blend animation state, update armature.
-		//     this._armature.advanceTime(0.0);
+		// if (!this._armature._lockUpdate && animationConfig.fadeInTime <= 0f) { // Blend animation state, update armature.
+		//     this._armature.advanceTime(0f);
 		// }
 
 		this._lastAnimationState = animationState
@@ -520,7 +520,7 @@ class Animation(pool: BaseObjectPool) : BaseObject(pool) {
 		_animationConfig1.clear()
 		_animationConfig1.resetToPose = true
 		_animationConfig1.playTimes = playTimes
-		_animationConfig1.fadeInTime = 0.0
+		_animationConfig1.fadeInTime = 0f
 		_animationConfig1.animation = animationName ?: ""
 
 		if (animationName != null && animationName.isNotEmpty()) {
@@ -548,7 +548,7 @@ class Animation(pool: BaseObjectPool) : BaseObject(pool) {
 	 * @param animationName - The name of animation data.
 	 * @param fadeInTime - The fade in time. [-1: Use the default value of animation data, [0~N]: The fade in time (In seconds)] (Default: -1)
 	 * @param playTimes - playing repeat times. [-1: Use the default value of animation data, 0: No end loop playing, [1~N]: Repeat N times] (Default: -1)
-	 * @param layer - The blending layer, the animation states in high level layer will get the blending weights with high priority, when the total blending weights are more than 1.0, there will be no more weights can be allocated to the other animation states. (Default: 0)
+	 * @param layer - The blending layer, the animation states in high level layer will get the blending weights with high priority, when the total blending weights are more than 1f, there will be no more weights can be allocated to the other animation states. (Default: 0)
 	 * @param group - The blending group name, it is typically used to specify the substitution of multiple animation states blending. (Default: null)
 	 * @param fadeOutMode - The fade out mode, which is typically used to specify alternate mode of multiple animation states blending. (Default: AnimationFadeOutMode.SameLayerAndGroup)
 	 * @returns The playing animation state.
@@ -565,7 +565,7 @@ class Animation(pool: BaseObjectPool) : BaseObject(pool) {
 	 * @param animationName - 动画数据名称。
 	 * @param fadeInTime - 淡入时间。 [-1: 使用动画数据默认值, [0~N]: 淡入时间 (以秒为单位)] （默认: -1）
 	 * @param playTimes - 播放次数。 [-1: 使用动画数据默认值, 0: 无限循环播放, [1~N]: 循环播放 N 次] （默认: -1）
-	 * @param layer - 混合图层，图层高的动画状态会优先获取混合权重，当混合权重分配总和超过 1.0 时，剩余的动画状态将不能再获得权重分配。 （默认: 0）
+	 * @param layer - 混合图层，图层高的动画状态会优先获取混合权重，当混合权重分配总和超过 1f 时，剩余的动画状态将不能再获得权重分配。 （默认: 0）
 	 * @param group - 混合组名称，该属性通常用来指定多个动画状态混合时的相互替换关系。 （默认: null）
 	 * @param fadeOutMode - 淡出模式，该属性通常用来指定多个动画状态混合时的相互替换模式。 （默认: AnimationFadeOutMode.SameLayerAndGroup）
 	 * @returns 播放的动画状态。
@@ -578,7 +578,7 @@ class Animation(pool: BaseObjectPool) : BaseObject(pool) {
 	 * @language zh_CN
 	 */
 	fun fadeIn(
-		animationName: String, fadeInTime: Double = -1.0, playTimes: Int = -1,
+		animationName: String, fadeInTime: Float = -1f, playTimes: Int = -1,
 		layer: Int = 0, group: String? = null, fadeOutMode: AnimationFadeOutMode = AnimationFadeOutMode.SameLayerAndGroup
 	): AnimationState? {
 		val _animationConfig1 = this._animationConfig!!
@@ -610,13 +610,13 @@ class Animation(pool: BaseObjectPool) : BaseObject(pool) {
 	 * @version DragonBones 4.5
 	 * @language zh_CN
 	 */
-	fun gotoAndPlayByTime(animationName: String, time: Double = 0.0, playTimes: Int = -1): AnimationState? {
+	fun gotoAndPlayByTime(animationName: String, time: Float = 0f, playTimes: Int = -1): AnimationState? {
 		val _animationConfig1 = this._animationConfig!!
 		_animationConfig1.clear()
 		_animationConfig1.resetToPose = true
 		_animationConfig1.playTimes = playTimes
 		_animationConfig1.position = time
-		_animationConfig1.fadeInTime = 0.0
+		_animationConfig1.fadeInTime = 0f
 		_animationConfig1.animation = animationName
 
 		return this.playConfig(_animationConfig1)
@@ -644,12 +644,12 @@ class Animation(pool: BaseObjectPool) : BaseObject(pool) {
 		_animationConfig1.clear()
 		_animationConfig1.resetToPose = true
 		_animationConfig1.playTimes = playTimes
-		_animationConfig1.fadeInTime = 0.0
+		_animationConfig1.fadeInTime = 0f
 		_animationConfig1.animation = animationName
 
 		val animationData = if (animationName in this._animations) this._animations[animationName] else null
 		if (animationData != null) {
-			_animationConfig1.position = if (animationData.frameCount > 0) animationData.duration * frame / animationData.frameCount else 0.0
+			_animationConfig1.position = if (animationData.frameCount > 0) animationData.duration * frame / animationData.frameCount else 0f
 		}
 
 		return this.playConfig(_animationConfig1!!)
@@ -672,17 +672,17 @@ class Animation(pool: BaseObjectPool) : BaseObject(pool) {
 	 * @version DragonBones 4.5
 	 * @language zh_CN
 	 */
-	fun gotoAndPlayByProgress(animationName: String, progress: Double = 0.0, playTimes: Int = -1): AnimationState? {
+	fun gotoAndPlayByProgress(animationName: String, progress: Float = 0f, playTimes: Int = -1): AnimationState? {
 		val _animationConfig1 = this._animationConfig!!
 		_animationConfig1.clear()
 		_animationConfig1.resetToPose = true
 		_animationConfig1.playTimes = playTimes
-		_animationConfig1.fadeInTime = 0.0
+		_animationConfig1.fadeInTime = 0f
 		_animationConfig1.animation = animationName
 
 		val animationData = if (animationName in this._animations) this._animations[animationName] else null
 		if (animationData != null) {
-			_animationConfig1.position = animationData.duration * (if (progress > 0.0) progress else 0.0)
+			_animationConfig1.position = animationData.duration * (if (progress > 0f) progress else 0f)
 		}
 
 		return this.playConfig(_animationConfig1!!)
@@ -703,7 +703,7 @@ class Animation(pool: BaseObjectPool) : BaseObject(pool) {
 	 * @version DragonBones 4.5
 	 * @language zh_CN
 	 */
-	fun gotoAndStopByTime(animationName: String, time: Double = 0.0): AnimationState? {
+	fun gotoAndStopByTime(animationName: String, time: Float = 0f): AnimationState? {
 		val animationState = this.gotoAndPlayByTime(animationName, time, 1)
 		if (animationState != null) {
 			animationState.stop()
@@ -751,7 +751,7 @@ class Animation(pool: BaseObjectPool) : BaseObject(pool) {
 	 * @version DragonBones 4.5
 	 * @language zh_CN
 	 */
-	fun gotoAndStopByProgress(animationName: String, progress: Double = 0.0): AnimationState? {
+	fun gotoAndStopByProgress(animationName: String, progress: Float = 0f): AnimationState? {
 		val animationState = this.gotoAndPlayByProgress(animationName, progress, 1)
 		animationState?.stop()
 		return animationState

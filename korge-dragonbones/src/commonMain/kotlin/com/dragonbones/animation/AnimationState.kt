@@ -26,6 +26,7 @@ package com.dragonbones.animation
 import com.dragonbones.armature.*
 import com.dragonbones.core.*
 import com.dragonbones.event.*
+import com.dragonbones.geom.*
 import com.dragonbones.model.*
 import com.dragonbones.util.*
 import com.soywiz.kds.*
@@ -126,7 +127,7 @@ class AnimationState(pool: BaseObjectPool) : BaseObject(pool) {
 	 * - The play speed.
 	 * The value is an overlay relationship with {@link dragonBones.Animation#timeScale}.
 	 * [(-N~0): Reverse play, 0: Stop play, (0~1): Slow play, 1: Normal play, (1~N): Fast play]
-	 * @default 1.0
+	 * @default 1f
 	 * @version DragonBones 3.0
 	 * @language en_US
 	 */
@@ -134,46 +135,46 @@ class AnimationState(pool: BaseObjectPool) : BaseObject(pool) {
 	 * - 播放速度。
 	 * 该值与 {@link dragonBones.Animation#timeScale} 是叠加关系。
 	 * [(-N~0): 倒转播放, 0: 停止播放, (0~1): 慢速播放, 1: 正常播放, (1~N): 快速播放]
-	 * @default 1.0
+	 * @default 1f
 	 * @version DragonBones 3.0
 	 * @language zh_CN
 	 */
-	var timeScale: Double = 1.0
+	var timeScale: Float = 1f
 	/**
 	 * @private
 	 */
-	var parameterX: Double = 0.0
+	var parameterX: Float = 0f
 	/**
 	 * @private
 	 */
-	var parameterY: Double = 0.0
+	var parameterY: Float = 0f
 	/**
 	 * @private
 	 */
-	var positionX: Double = 0.0
+	var positionX: Float = 0f
 	/**
 	 * @private
 	 */
-	var positionY: Double = 0.0
+	var positionY: Float = 0f
 	/**
 	 * - The auto fade out time when the animation state play completed.
 	 * [-1: Do not fade out automatically, [0~N]: The fade out time] (In seconds)
-	 * @default -1.0
+	 * @default -1f
 	 * @version DragonBones 5.0
 	 * @language en_US
 	 */
 	/**
 	 * - 动画状态播放完成后的自动淡出时间。
 	 * [-1: 不自动淡出, [0~N]: 淡出时间] （以秒为单位）
-	 * @default -1.0
+	 * @default -1f
 	 * @version DragonBones 5.0
 	 * @language zh_CN
 	 */
-	var autoFadeOutTime: Double = 0.0
+	var autoFadeOutTime: Float = 0f
 	/**
 	 * @private
 	 */
-	var fadeTotalTime: Double = 0.0
+	var fadeTotalTime: Float = 0f
 	/**
 	 * - The name of the animation state. (Can be different from the name of the animation data)
 	 * @readonly
@@ -221,22 +222,22 @@ class AnimationState(pool: BaseObjectPool) : BaseObject(pool) {
 	/**
 	 * @internal
 	 */
-	var _position: Double = 0.0
+	var _position: Float = 0f
 	/**
 	 * @internal
 	 */
-	var _duration: Double = 0.0
-	private var _weight: Double = 1.0
-	private var _fadeTime: Double = 0.0
-	private var _time: Double = 0.0
+	var _duration: Float = 0f
+	private var _weight: Float = 1f
+	private var _fadeTime: Float = 0f
+	private var _time: Float = 0f
 	/**
 	 * @internal
 	 */
-	var _fadeProgress: Double = 0.0
+	var _fadeProgress: Float = 0f
 	/**
 	 * @internal
 	 */
-	var _weightResult: Double = 0.0
+	var _weightResult: Float = 0f
 	private val _boneMask: ArrayList<String> = arrayListOf()
 	private val _boneTimelines: ArrayList<TimelineState> = arrayListOf()
 	private val _boneBlendTimelines: ArrayList<TimelineState> = arrayListOf()
@@ -301,14 +302,14 @@ class AnimationState(pool: BaseObjectPool) : BaseObject(pool) {
 		this.blendType = AnimationBlendType.None
 		this.playTimes = 1
 		this.layer = 0
-		this.timeScale = 1.0
-		this._weight = 1.0
-		this.parameterX = 0.0
-		this.parameterY = 0.0
-		this.positionX = 0.0
-		this.positionY = 0.0
-		this.autoFadeOutTime = 0.0
-		this.fadeTotalTime = 0.0
+		this.timeScale = 1f
+		this._weight = 1f
+		this.parameterX = 0f
+		this.parameterY = 0f
+		this.positionX = 0f
+		this.positionY = 0f
+		this.autoFadeOutTime = 0f
+		this.fadeTotalTime = 0f
 		this.name = ""
 		this.group = ""
 
@@ -316,12 +317,12 @@ class AnimationState(pool: BaseObjectPool) : BaseObject(pool) {
 		this._playheadState = 0
 		this._fadeState = -1
 		this._subFadeState = -1
-		this._position = 0.0
-		this._duration = 0.0
-		this._fadeTime = 0.0
-		this._time = 0.0
-		this._fadeProgress = 0.0
-		this._weightResult = 0.0
+		this._position = 0f
+		this._duration = 0f
+		this._fadeTime = 0f
+		this._time = 0f
+		this._fadeProgress = 0f
+		this._weightResult = 0f
 		this._boneMask.clear()
 		this._boneTimelines.clear()
 		this._boneBlendTimelines.clear()
@@ -659,7 +660,7 @@ class AnimationState(pool: BaseObjectPool) : BaseObject(pool) {
 		}
 	}
 
-	private fun _advanceFadeTime(passedTime: Double) {
+	private fun _advanceFadeTime(passedTime: Float) {
 		var passedTime = passedTime
 		val isFadeOut = this._fadeState > 0
 
@@ -679,7 +680,7 @@ class AnimationState(pool: BaseObjectPool) : BaseObject(pool) {
 			}
 		}
 
-		if (passedTime < 0.0) {
+		if (passedTime < 0f) {
 			passedTime = -passedTime
 		}
 
@@ -687,12 +688,12 @@ class AnimationState(pool: BaseObjectPool) : BaseObject(pool) {
 
 		if (this._fadeTime >= this.fadeTotalTime) { // Fade complete.
 			this._subFadeState = 1
-			this._fadeProgress = if (isFadeOut) 0.0 else 1.0
-		} else if (this._fadeTime > 0.0) { // Fading.
+			this._fadeProgress = if (isFadeOut) 0f else 1f
+		} else if (this._fadeTime > 0f) { // Fading.
 			this._fadeProgress =
-					if (isFadeOut) (1.0 - this._fadeTime / this.fadeTotalTime) else (this._fadeTime / this.fadeTotalTime)
+					if (isFadeOut) (1f - this._fadeTime / this.fadeTotalTime) else (this._fadeTime / this.fadeTotalTime)
 		} else { // Before fade.
-			this._fadeProgress = if (isFadeOut) 1.0 else 0.0
+			this._fadeProgress = if (isFadeOut) 1f else 0f
 		}
 
 		if (this._subFadeState > 0) { // Fade complete event.
@@ -747,31 +748,31 @@ class AnimationState(pool: BaseObjectPool) : BaseObject(pool) {
 			this._playheadState = 3 // 11
 		}
 
-		if (animationConfig.duration < 0.0) {
-			this._position = 0.0
+		if (animationConfig.duration < 0f) {
+			this._position = 0f
 			this._duration = this._animationData!!.duration
 
-			if (animationConfig.position != 0.0) {
-				if (this.timeScale >= 0.0) {
+			if (animationConfig.position != 0f) {
+				if (this.timeScale >= 0f) {
 					this._time = animationConfig.position
 				} else {
 					this._time = animationConfig.position - this._duration
 				}
 			} else {
-				this._time = 0.0
+				this._time = 0f
 			}
 		} else {
 			this._position = animationConfig.position
 			this._duration = animationConfig.duration
-			this._time = 0.0
+			this._time = 0f
 		}
 
-		if (this.timeScale < 0.0 && this._time == 0.0) {
-			this._time = -0.000001 // Turn to end.
+		if (this.timeScale < 0f && this._time == 0f) {
+			this._time = -0.000001f // Turn to end.
 		}
 
-		if (this.fadeTotalTime <= 0.0) {
-			this._fadeProgress = 0.999999 // Make different.
+		if (this.fadeTotalTime <= 0f) {
+			this._fadeProgress = 0.999999f // Make different.
 		}
 
 		if (animationConfig.boneMask.length > 0) {
@@ -786,7 +787,7 @@ class AnimationState(pool: BaseObjectPool) : BaseObject(pool) {
 		this._actionTimeline!!.init(this._armature!!, this, this._animationData!!.actionTimeline)
 		this._actionTimeline!!._currentTime = this._time
 
-		if (this._actionTimeline!!._currentTime < 0.0) {
+		if (this._actionTimeline!!._currentTime < 0f) {
 			this._actionTimeline!!._currentTime = this._duration - this._actionTimeline!!._currentTime
 		}
 
@@ -799,7 +800,7 @@ class AnimationState(pool: BaseObjectPool) : BaseObject(pool) {
 	/**
 	 * @internal
 	 */
-	fun advanceTime(passedTime: Double, cacheFrameRate: Double) {
+	fun advanceTime(passedTime: Float, cacheFrameRate: Float) {
 		var passedTime = passedTime
 
 		// Update fade time.
@@ -808,7 +809,7 @@ class AnimationState(pool: BaseObjectPool) : BaseObject(pool) {
 		}
 		// Update time.
 		if (this._playheadState == 3) { // 11
-			if (this.timeScale != 1.0) {
+			if (this.timeScale != 1f) {
 				passedTime *= this.timeScale
 			}
 
@@ -825,7 +826,7 @@ class AnimationState(pool: BaseObjectPool) : BaseObject(pool) {
 		}
 
 		val isBlendDirty = this._fadeState != 0 || this._subFadeState == 0
-		val isCacheEnabled = this._fadeState == 0 && cacheFrameRate > 0.0
+		val isCacheEnabled = this._fadeState == 0 && cacheFrameRate > 0f
 		var isUpdateTimeline = true
 		var isUpdateBoneTimeline = true
 		var time = this._time
@@ -839,12 +840,12 @@ class AnimationState(pool: BaseObjectPool) : BaseObject(pool) {
 			this._actionTimeline?.update(time)
 		}
 
-		if (this._weight == 0.0) {
+		if (this._weight == 0f) {
 			return
 		}
 
 		if (isCacheEnabled) { // Cache time internval.
-			val internval = cacheFrameRate * 2.0
+			val internval = cacheFrameRate * 2f
 			this._actionTimeline!!._currentTime = floor(this._actionTimeline!!._currentTime * internval) / internval
 		}
 
@@ -957,8 +958,8 @@ class AnimationState(pool: BaseObjectPool) : BaseObject(pool) {
 			}
 
 			if (this._animationTimelines.lengthSet > 0) {
-				var dL = 100.0
-				var dR = 100.0
+				var dL = 100f
+				var dR = 100f
 				var leftState: AnimationState? = null
 				var rightState: AnimationState? = null
 
@@ -973,7 +974,7 @@ class AnimationState(pool: BaseObjectPool) : BaseObject(pool) {
 						val animationState = timeline.target as AnimationState
 						val d = this.parameterX - animationState.positionX
 
-						if (d >= 0.0) {
+						if (d >= 0f) {
 							if (d < dL) {
 								dL = d
 								leftState = animationState
@@ -990,7 +991,7 @@ class AnimationState(pool: BaseObjectPool) : BaseObject(pool) {
 				if (leftState != null) {
 					if (this._activeChildA != leftState) {
 						if (this._activeChildA != null) {
-							this._activeChildA!!.weight = 0.0
+							this._activeChildA!!.weight = 0f
 						}
 
 						this._activeChildA = leftState
@@ -999,7 +1000,7 @@ class AnimationState(pool: BaseObjectPool) : BaseObject(pool) {
 
 					if (this._activeChildB != rightState) {
 						if (this._activeChildB != null) {
-							this._activeChildB!!.weight = 0.0
+							this._activeChildB!!.weight = 0f
 						}
 
 						this._activeChildB = rightState
@@ -1008,7 +1009,7 @@ class AnimationState(pool: BaseObjectPool) : BaseObject(pool) {
 					leftState.weight = dR / (dL + dR)
 
 					if (rightState != null) {
-						rightState.weight = 1.0 - leftState.weight
+						rightState.weight = 1f - leftState.weight
 					}
 				}
 			}
@@ -1061,7 +1062,7 @@ class AnimationState(pool: BaseObjectPool) : BaseObject(pool) {
 			}
 
 			if (this._actionTimeline!!.playState > 0) {
-				if (this.autoFadeOutTime >= 0.0) { // Auto fade out.
+				if (this.autoFadeOutTime >= 0f) { // Auto fade out.
 					this.fadeOut(this.autoFadeOutTime)
 				}
 			}
@@ -1107,10 +1108,10 @@ class AnimationState(pool: BaseObjectPool) : BaseObject(pool) {
 	 * @version DragonBones 3.0
 	 * @language zh_CN
 	 */
-	fun fadeOut(fadeOutTime: Double, pausePlayhead: Boolean = true): Unit {
+	fun fadeOut(fadeOutTime: Float, pausePlayhead: Boolean = true): Unit {
 		var fadeOutTime = fadeOutTime
-		if (fadeOutTime < 0.0) {
-			fadeOutTime = 0.0
+		if (fadeOutTime < 0f) {
+			fadeOutTime = 0f
 		}
 
 		if (pausePlayhead) {
@@ -1125,8 +1126,8 @@ class AnimationState(pool: BaseObjectPool) : BaseObject(pool) {
 			this._fadeState = 1
 			this._subFadeState = -1
 
-			if (fadeOutTime <= 0.0 || this._fadeProgress <= 0.0) {
-				this._fadeProgress = 0.000001 // Modify fade progress to different value.
+			if (fadeOutTime <= 0f || this._fadeProgress <= 0f) {
+				this._fadeProgress = 0.000001f // Modify fade progress to different value.
 			}
 
 			for (timeline in this._boneTimelines) {
@@ -1153,13 +1154,13 @@ class AnimationState(pool: BaseObjectPool) : BaseObject(pool) {
 				timeline.fadeOut()
 				//
 				val animaitonState = timeline.target as AnimationState
-				animaitonState.fadeOut(999999.0, true)
+				animaitonState.fadeOut(999999f, true)
 			}
 		}
 
 		this.displayControl = false //
-		this.fadeTotalTime = if (this._fadeProgress > 0.000001) fadeOutTime / this._fadeProgress else 0.0
-		this._fadeTime = this.fadeTotalTime * (1.0 - this._fadeProgress)
+		this.fadeTotalTime = if (this._fadeProgress > 0.000001f) fadeOutTime / this._fadeProgress else 0f
+		this._fadeTime = this.fadeTotalTime * (1f - this._fadeProgress)
 	}
 	/**
 	 * - Check if a specific bone mask is included.
@@ -1286,7 +1287,7 @@ class AnimationState(pool: BaseObjectPool) : BaseObject(pool) {
 							val animaitonTimelineData = timelineData as AnimationTimelineData
 							animationState.positionX = animaitonTimelineData.x
 							animationState.positionY = animaitonTimelineData.y
-							animationState.weight = 0.0
+							animationState.weight = 0f
 						}
 
 						animationState._parent = this
@@ -1325,7 +1326,7 @@ class AnimationState(pool: BaseObjectPool) : BaseObject(pool) {
 	fun activeTimeline(): Unit {
 		for (timeline in this._slotTimelines) {
 			timeline.dirty = true
-			timeline._currentTime = -1.0
+			timeline._currentTime = -1f
 		}
 	}
 	/**
@@ -1422,7 +1423,7 @@ class AnimationState(pool: BaseObjectPool) : BaseObject(pool) {
 	 * @version DragonBones 3.0
 	 * @language zh_CN
 	 */
-	val totalTime: Double
+	val totalTime: Float
 		get() {
 			return this._duration
 		}
@@ -1436,7 +1437,7 @@ class AnimationState(pool: BaseObjectPool) : BaseObject(pool) {
 	 * @version DragonBones 3.0
 	 * @language zh_CN
 	 */
-	var currentTime: Double
+	var currentTime: Float
 		get() = this._actionTimeline!!._currentTime
 		set(value) {
 			var value = value
@@ -1453,7 +1454,7 @@ class AnimationState(pool: BaseObjectPool) : BaseObject(pool) {
 				this.playTimes > 0 && currentPlayTimes == this.playTimes - 1 &&
 				value == this._duration && this._parent == null
 			) {
-				value = this._duration - 0.000001 //
+				value = this._duration - 0.000001f //
 			}
 
 			if (this._time == value) {
@@ -1470,13 +1471,13 @@ class AnimationState(pool: BaseObjectPool) : BaseObject(pool) {
 		}
 	/**
 	 * - The blend weight.
-	 * @default 1.0
+	 * @default 1f
 	 * @version DragonBones 5.0
 	 * @language en_US
 	 */
 	/**
 	 * - 混合权重。
-	 * @default 1.0
+	 * @default 1f
 	 * @version DragonBones 5.0
 	 * @language zh_CN
 	 */
@@ -1486,7 +1487,7 @@ class AnimationState(pool: BaseObjectPool) : BaseObject(pool) {
 	 * @version DragonBones 3.0
 	 * @language en_US
 	 */
-	var weight: Double
+	var weight: Float
 		get() = this._weight
 		set(value) {
 			if (this._weight == value) return
@@ -1523,9 +1524,9 @@ class BlendState(pool: BaseObjectPool) : BaseObject(pool) {
 
 	var dirty: Int = 0
 	var layer: Int = 0
-	var leftWeight: Double = 0.0
-	var layerWeight: Double = 0.0
-	var blendWeight: Double = 0.0
+	var leftWeight: Float = 0f
+	var layerWeight: Float = 0f
+	var blendWeight: Float = 0f
 	var target: BaseObject? = null
 
 	override fun _onClear() {
@@ -1536,9 +1537,9 @@ class BlendState(pool: BaseObjectPool) : BaseObject(pool) {
 	fun reset() {
 		this.dirty = 0
 		this.layer = 0
-		this.leftWeight = 0.0
-		this.layerWeight = 0.0
-		this.blendWeight = 0.0
+		this.leftWeight = 0f
+		this.layerWeight = 0f
+		this.blendWeight = 0f
 	}
 
 	fun update(animationState: AnimationState): Boolean {
@@ -1546,20 +1547,20 @@ class BlendState(pool: BaseObjectPool) : BaseObject(pool) {
 		var animationWeight = animationState._weightResult
 
 		if (this.dirty > 0) {
-			if (this.leftWeight > 0.0) {
+			if (this.leftWeight > 0f) {
 				if (this.layer != animationLayer) {
 					if (this.layerWeight >= this.leftWeight) {
 						this.dirty++
 						this.layer = animationLayer
-						this.leftWeight = 0.0
-						this.blendWeight = 0.0
+						this.leftWeight = 0f
+						this.blendWeight = 0f
 
 						return false
 					}
 
 					this.layer = animationLayer
 					this.leftWeight -= this.layerWeight
-					this.layerWeight = 0.0
+					this.layerWeight = 0f
 				}
 
 				animationWeight *= this.leftWeight
@@ -1575,7 +1576,7 @@ class BlendState(pool: BaseObjectPool) : BaseObject(pool) {
 
 		this.dirty++
 		this.layer = animationLayer
-		this.leftWeight = 1.0
+		this.leftWeight = 1f
 		this.blendWeight = animationWeight
 		this.layerWeight = animationWeight
 

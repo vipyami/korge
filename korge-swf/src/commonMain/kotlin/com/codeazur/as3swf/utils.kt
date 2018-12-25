@@ -13,13 +13,13 @@ import com.soywiz.korma.math.*
 import kotlin.math.*
 
 object ColorUtils {
-	fun alpha(color: Int): Double = (color ushr 24).toDouble() / 255
+	fun alpha(color: Int): Float = (color ushr 24).toFloat() / 255f
 	fun rgb(color: Int): Int = (color and 0xffffff)
-	fun r(color: Int): Double = ((rgb(color) ushr 16) and 0xff).toDouble() / 255
-	fun g(color: Int): Double = ((rgb(color) ushr 8) and 0xff).toDouble() / 255
-	fun b(color: Int): Double = ((rgb(color) ushr 0) and 0xff).toDouble() / 255
+	fun r(color: Int): Float = ((rgb(color) ushr 16) and 0xff).toFloat() / 255
+	fun g(color: Int): Float = ((rgb(color) ushr 8) and 0xff).toFloat() / 255
+	fun b(color: Int): Float = ((rgb(color) ushr 0) and 0xff).toFloat() / 255
 
-	fun interpolate(color1: Int, color2: Int, ratio: Double): Int {
+	fun interpolate(color1: Int, color2: Int, ratio: Float): Int {
 		val r1 = r(color1)
 		val g1 = g(color1)
 		val b1 = b(color1)
@@ -37,7 +37,7 @@ object ColorUtils {
 }
 
 object MatrixUtils {
-	fun interpolate(matrix1: SWFMatrix, matrix2: SWFMatrix, ratio: Double): SWFMatrix {
+	fun interpolate(matrix1: SWFMatrix, matrix2: SWFMatrix, ratio: Float): SWFMatrix {
 		// TODO: not sure about this at all
 		val matrix = SWFMatrix()
 		matrix.scaleX = matrix1.scaleX + (matrix2.scaleX - matrix1.scaleX) * ratio
@@ -53,6 +53,9 @@ object MatrixUtils {
 object NumberUtils {
 	fun roundPixels20(pixels: Double): Double = round(pixels * 100) / 100
 	fun roundPixels400(pixels: Double): Double = round(pixels * 10000) / 10000
+
+	fun roundPixels20(pixels: Float): Float = round(pixels * 100f) / 100f
+	fun roundPixels400(pixels: Float): Float = round(pixels * 10000f) / 10000f
 	//fun roundPixels20(pixels: Double): Double = round(pixels * 1000000).toDouble() / 1000000
 	//fun roundPixels400(pixels: Double): Double = round(pixels * 1000000).toDouble() / 1000000
 }

@@ -53,12 +53,12 @@ abstract class Scene : InjectorAsyncDependency, ViewsContainer, CoroutineScope {
 
 abstract class ScaledScene : Scene() {
 	open val sceneSize: ISize = ISize(320, 240)
-	open val sceneScale: Double = 2.0
+	open val sceneScale: Float = 2f
 	open val sceneFiltering: Boolean = false
 
 	override fun createSceneView(): Container = ScaleView(
-		sceneSize.width.toInt(),
-		sceneSize.height.toInt(),
+		sceneSize.width,
+		sceneSize.height,
 		scale = sceneScale,
 		filtering = sceneFiltering
 	)
@@ -102,4 +102,3 @@ abstract class LogScene : Scene() {
 }
 
 suspend fun Scene.sleep(time: TimeSpan) = sceneView.sleep(time)
-suspend fun Scene.sleepMs(time: Int) = sceneView.sleepMs(time)

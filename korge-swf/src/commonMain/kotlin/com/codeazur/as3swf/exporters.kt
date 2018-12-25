@@ -2,7 +2,7 @@ package com.codeazur.as3swf
 
 import com.soywiz.korim.vector.*
 import com.soywiz.korio.lang.*
-import com.soywiz.korma.*
+
 import com.soywiz.korma.geom.*
 
 open class ShapeExporter {
@@ -10,21 +10,21 @@ open class ShapeExporter {
 	open fun endShape() = Unit
 
 	open fun beginFills() = Unit
-	open fun beginFill(color: Int, alpha: Double = 1.0) = Unit
+	open fun beginFill(color: Int, alpha: Float = 1f) = Unit
 	open fun beginGradientFill(
 		type: GradientType,
 		colors: List<Int>,
-		alphas: List<Double>,
+		alphas: List<Float>,
 		ratios: List<Int>,
-		matrix: Matrix2d = Matrix2d(),
+		matrix: Matrix = Matrix(),
 		spreadMethod: GradientSpreadMode = GradientSpreadMode.PAD,
 		interpolationMethod: GradientInterpolationMode = GradientInterpolationMode.NORMAL,
-		focalPointRatio: Double = 0.0
+		focalPointRatio: Float = 0f
 	) = Unit
 
 	open fun beginBitmapFill(
 		bitmapId: Int,
-		matrix: Matrix2d = Matrix2d(),
+		matrix: Matrix = Matrix(),
 		repeat: Boolean = true,
 		smooth: Boolean = false
 	) = Unit
@@ -34,33 +34,33 @@ open class ShapeExporter {
 
 	open fun beginLines() = Unit
 	open fun lineStyle(
-		thickness: Double = Double.NaN,
+		thickness: Float = Float.NaN,
 		color: Int = 0,
-		alpha: Double = 1.0,
+		alpha: Float = 1f,
 		pixelHinting: Boolean = false,
 		scaleMode: Context2d.ScaleMode = Context2d.ScaleMode.NORMAL,
 		startCaps: LineCapsStyle = LineCapsStyle.ROUND,
 		endCaps: LineCapsStyle = LineCapsStyle.ROUND,
 		joints: String? = null,
-		miterLimit: Double = 3.0
+		miterLimit: Float = 3f
 	) = Unit
 
 	open fun lineGradientStyle(
 		type: GradientType,
 		colors: List<Int>,
-		alphas: List<Double>,
+		alphas: List<Float>,
 		ratios: List<Int>,
-		matrix: Matrix2d = Matrix2d(),
+		matrix: Matrix = Matrix(),
 		spreadMethod: GradientSpreadMode = GradientSpreadMode.PAD,
 		interpolationMethod: GradientInterpolationMode = GradientInterpolationMode.NORMAL,
-		focalPointRatio: Double = 0.0
+		focalPointRatio: Float = 0f
 	) = Unit
 
 	open fun endLines() = Unit
 
-	open fun moveTo(x: Double, y: Double) = Unit
-	open fun lineTo(x: Double, y: Double) = Unit
-	open fun curveTo(controlX: Double, controlY: Double, anchorX: Double, anchorY: Double) = Unit
+	open fun moveTo(x: Float, y: Float) = Unit
+	open fun lineTo(x: Float, y: Float) = Unit
+	open fun curveTo(controlX: Float, controlY: Float, anchorX: Float, anchorY: Float) = Unit
 	open fun closePath() = Unit
 }
 
@@ -75,18 +75,18 @@ open class LoggerShapeExporter(val parent: ShapeExporter, val logger: (String) -
 	override fun endLines() = log("endLines()").parent.endLines()
 	override fun closePath() = log("closePath()").parent.closePath()
 
-	override fun beginFill(color: Int, alpha: Double) =
+	override fun beginFill(color: Int, alpha: Float) =
 		log("beginFill(${"%06X".format(color)}, $alpha)").parent.beginFill(color, alpha)
 
 	override fun beginGradientFill(
 		type: GradientType,
 		colors: List<Int>,
-		alphas: List<Double>,
+		alphas: List<Float>,
 		ratios: List<Int>,
-		matrix: Matrix2d,
+		matrix: Matrix,
 		spreadMethod: GradientSpreadMode,
 		interpolationMethod: GradientInterpolationMode,
-		focalPointRatio: Double
+		focalPointRatio: Float
 	) {
 		log("beginGradientFill($type, $colors, $alphas, $ratios, $matrix, $spreadMethod, $interpolationMethod, $focalPointRatio)").parent.beginGradientFill(
 			type,
@@ -100,7 +100,7 @@ open class LoggerShapeExporter(val parent: ShapeExporter, val logger: (String) -
 		)
 	}
 
-	override fun beginBitmapFill(bitmapId: Int, matrix: Matrix2d, repeat: Boolean, smooth: Boolean) {
+	override fun beginBitmapFill(bitmapId: Int, matrix: Matrix, repeat: Boolean, smooth: Boolean) {
 		log("beginBitmapFill($bitmapId, $matrix, $repeat, $smooth)").parent.beginBitmapFill(
 			bitmapId,
 			matrix,
@@ -111,15 +111,15 @@ open class LoggerShapeExporter(val parent: ShapeExporter, val logger: (String) -
 
 	override fun endFill() = log("endFill()").parent.endFill()
 	override fun lineStyle(
-		thickness: Double,
+		thickness: Float,
 		color: Int,
-		alpha: Double,
+		alpha: Float,
 		pixelHinting: Boolean,
 		scaleMode: Context2d.ScaleMode,
 		startCaps: LineCapsStyle,
 		endCaps: LineCapsStyle,
 		joints: String?,
-		miterLimit: Double
+		miterLimit: Float
 	) {
 		log("lineStyle($thickness, $color, $alpha, $pixelHinting, $scaleMode, $startCaps, $endCaps, $joints, $miterLimit)").parent.lineStyle(
 			thickness,
@@ -137,12 +137,12 @@ open class LoggerShapeExporter(val parent: ShapeExporter, val logger: (String) -
 	override fun lineGradientStyle(
 		type: GradientType,
 		colors: List<Int>,
-		alphas: List<Double>,
+		alphas: List<Float>,
 		ratios: List<Int>,
-		matrix: Matrix2d,
+		matrix: Matrix,
 		spreadMethod: GradientSpreadMode,
 		interpolationMethod: GradientInterpolationMode,
-		focalPointRatio: Double
+		focalPointRatio: Float
 	) {
 		log("lineGradientStyle($type, $colors, $alphas, $ratios, $matrix, $spreadMethod, $interpolationMethod, $focalPointRatio)").parent.lineGradientStyle(
 			type,
@@ -156,40 +156,40 @@ open class LoggerShapeExporter(val parent: ShapeExporter, val logger: (String) -
 		)
 	}
 
-	override fun moveTo(x: Double, y: Double) = log("moveTo($x, $y)").parent.moveTo(x, y)
-	override fun lineTo(x: Double, y: Double) = log("lineTo($x, $y)").parent.lineTo(x, y)
-	override fun curveTo(controlX: Double, controlY: Double, anchorX: Double, anchorY: Double) =
+	override fun moveTo(x: Float, y: Float) = log("moveTo($x, $y)").parent.moveTo(x, y)
+	override fun lineTo(x: Float, y: Float) = log("lineTo($x, $y)").parent.lineTo(x, y)
+	override fun curveTo(controlX: Float, controlY: Float, anchorX: Float, anchorY: Float) =
 		log("curveTo($controlX, $controlY, $anchorX, $anchorY)").parent.curveTo(controlX, controlY, anchorX, anchorY)
 }
 
 class ShapeExporterBoundsBuilder : ShapeExporter() {
 	val bb = BoundsBuilder()
 
-	var lineWidth = 1.0
+	var lineWidth = 1f
 
 	override fun lineStyle(
-		thickness: Double,
+		thickness: Float,
 		color: Int,
-		alpha: Double,
+		alpha: Float,
 		pixelHinting: Boolean,
 		scaleMode: Context2d.ScaleMode,
 		startCaps: LineCapsStyle,
 		endCaps: LineCapsStyle,
 		joints: String?,
-		miterLimit: Double
+		miterLimit: Float
 	) {
 		lineWidth = thickness
 	}
 
 	override fun beginFills() {
-		lineWidth = 0.0
+		lineWidth = 0f
 	}
 
 	override fun beginLines() {
-		lineWidth = 1.0
+		lineWidth = 1f
 	}
 
-	private fun addPoint(x: Double, y: Double) {
+	private fun addPoint(x: Float, y: Float) {
 		bb.add(x - lineWidth, y - lineWidth)
 		bb.add(x + lineWidth, y + lineWidth)
 	}
@@ -199,23 +199,23 @@ class ShapeExporterBoundsBuilder : ShapeExporter() {
 		addPoint(rect.right, rect.bottom)
 	}
 
-	var lastX = 0.0
-	var lastY = 0.0
+	var lastX = 0f
+	var lastY = 0f
 
-	override fun moveTo(x: Double, y: Double) {
+	override fun moveTo(x: Float, y: Float) {
 		addPoint(x, y)
 		lastX = x
 		lastY = y
 	}
 
-	override fun lineTo(x: Double, y: Double) {
+	override fun lineTo(x: Float, y: Float) {
 		addPoint(x, y)
 		lastX = x
 		lastY = y
 	}
 
 	private val tempRect = Rectangle()
-	override fun curveTo(controlX: Double, controlY: Double, anchorX: Double, anchorY: Double) {
+	override fun curveTo(controlX: Float, controlY: Float, anchorX: Float, anchorY: Float) {
 		//addRect(Bezier.quadBounds(lastX, lastY, controlX, controlY, anchorX, anchorY, tempRect))
 		addPoint(controlX, controlY)
 		addPoint(anchorX, anchorY)

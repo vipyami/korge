@@ -296,11 +296,11 @@ abstract class DataParser(val pool: BaseObjectPool) {
 			}
 		}
 
-		fun parseDragonBonesDataJson(data: String, scale: Double = 1.0, pool: BaseObjectPool = BaseObjectPool()): DragonBonesData? {
+		fun parseDragonBonesDataJson(data: String, scale: Float = 1f, pool: BaseObjectPool = BaseObjectPool()): DragonBonesData? {
 			return ObjectDataParser(pool).parseDragonBonesData(Json.parse(data), scale)
 		}
 	}
 
-	abstract fun parseDragonBonesData(rawData: Any?, scale: Double = 1.0): DragonBonesData?
-	abstract fun parseTextureAtlasData(rawData: Any?, textureAtlasData: TextureAtlasData, scale: Double = 1.0): Boolean
+	abstract fun parseDragonBonesData(rawData: Any?, scale: Float = 1f): DragonBonesData?
+	abstract fun parseTextureAtlasData(rawData: Any?, textureAtlasData: TextureAtlasData, scale: Float = 1f): Boolean
 }

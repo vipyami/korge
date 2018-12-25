@@ -27,6 +27,7 @@ import com.dragonbones.geom.*
 import com.dragonbones.util.*
 import com.soywiz.kds.*
 
+
 /**
  * - The texture atlas data.
  * @version DragonBones 3.0
@@ -53,7 +54,7 @@ abstract class TextureAtlasData(pool: BaseObjectPool) :  BaseObject(pool) {
 	/**
 	 * @private
 	 */
-	var scale: Double = 1.0
+	var scale: Float = 1f
 	/**
 	 * - The texture atlas name.
 	 * @version DragonBones 3.0
@@ -88,7 +89,7 @@ abstract class TextureAtlasData(pool: BaseObjectPool) :  BaseObject(pool) {
 		this.autoSearch = false
 		this.width = 0
 		this.height = 0
-		this.scale = 1.0
+		this.scale = 1f
 		// this.textures.clear();
 		this.name = ""
 		this.imagePath = ""

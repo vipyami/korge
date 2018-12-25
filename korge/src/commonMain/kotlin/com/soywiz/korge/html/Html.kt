@@ -85,8 +85,8 @@ object Html {
 	data class PositionContext(
 		val provider: MetricsProvider,
 		val bounds: Rectangle,
-		var x: Double = 0.0,
-		var y: Double = 0.0
+		var x: Float = 0f,
+		var y: Float = 0f
 	)
 
 	data class Span(val format: Format, var text: String) : Extra by Extra.Mixin() {

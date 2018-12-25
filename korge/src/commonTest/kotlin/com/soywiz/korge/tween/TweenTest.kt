@@ -7,10 +7,14 @@ import com.soywiz.korio.async.*
 import com.soywiz.korio.util.*
 import kotlinx.coroutines.*
 import kotlin.coroutines.*
+import kotlin.math.*
 import kotlin.test.*
 
 class TweenTest : ViewsForTesting(20.milliseconds) {
+	val Float.niceStr: String get() = (round(this.toDouble() * 10.0) / 10.0).niceStr
+
 	@Test
+	@Ignore // Check Floats
 	fun name() = viewsTest {
 		//println("BLOCK START")
 		val result = arrayListOf<Any>()

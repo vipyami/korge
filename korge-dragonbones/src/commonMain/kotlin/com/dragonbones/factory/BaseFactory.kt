@@ -319,7 +319,7 @@ abstract class BaseFactory(val pool: BaseObjectPool, dataParser: DataParser = Ob
 	 * - Parse the raw data to a DragonBonesData instance and cache it to the factory.
 	 * @param rawData - The raw data.
 	 * @param name - Specify a cache name for the instance so that the instance can be obtained through this name. (If not set, use the instance name instead)
-	 * @param scale - Specify a scaling value for all armatures. (Default: 1.0)
+	 * @param scale - Specify a scaling value for all armatures. (Default: 1f)
 	 * @returns DragonBonesData instance
 	 * @see #getDragonBonesData()
 	 * @see #addDragonBonesData()
@@ -332,7 +332,7 @@ abstract class BaseFactory(val pool: BaseObjectPool, dataParser: DataParser = Ob
 	 * - 将原始数据解析为 DragonBonesData 实例，并缓存到工厂中。
 	 * @param rawData - 原始数据。
 	 * @param name - 为该实例指定一个缓存名称，以便可以通过此名称获取该实例。 （如果未设置，则使用该实例中的名称）
-	 * @param scale - 为所有的骨架指定一个缩放值。 （默认: 1.0）
+	 * @param scale - 为所有的骨架指定一个缩放值。 （默认: 1f）
 	 * @returns DragonBonesData 实例
 	 * @see #getDragonBonesData()
 	 * @see #addDragonBonesData()
@@ -341,7 +341,7 @@ abstract class BaseFactory(val pool: BaseObjectPool, dataParser: DataParser = Ob
 	 * @version DragonBones 4.5
 	 * @language zh_CN
 	 */
-	fun parseDragonBonesData(rawData: Any, name: String? = null, scale: Double = 1.0): DragonBonesData? {
+	fun parseDragonBonesData(rawData: Any, name: String? = null, scale: Float = 1f): DragonBonesData? {
 		val dataParser = if (rawData is MemBuffer) _binaryDataParser else this._dataParser
 		val dragonBonesData = dataParser.parseDragonBonesData(rawData, scale)
 
@@ -363,7 +363,7 @@ abstract class BaseFactory(val pool: BaseObjectPool, dataParser: DataParser = Ob
 		return dragonBonesData
 	}
 
-	fun parseDragonBonesDataJson(json: String, name: String? = null, scale: Double = 1.0): DragonBonesData? {
+	fun parseDragonBonesDataJson(json: String, name: String? = null, scale: Float = 1f): DragonBonesData? {
 		/*
 		val dragonBonesData = DataParser.parseDragonBonesDataJson(json)
 
@@ -392,7 +392,7 @@ abstract class BaseFactory(val pool: BaseObjectPool, dataParser: DataParser = Ob
 	 * @param rawData - The raw texture atlas data.
 	 * @param textureAtlas - The texture atlas object.
 	 * @param name - Specify a cache name for the instance so that the instance can be obtained through this name. (If not set, use the instance name instead)
-	 * @param scale - Specify a scaling value for the map set. (Default: 1.0)
+	 * @param scale - Specify a scaling value for the map set. (Default: 1f)
 	 * @returns TextureAtlasData instance
 	 * @see #getTextureAtlasData()
 	 * @see #addTextureAtlasData()
@@ -406,7 +406,7 @@ abstract class BaseFactory(val pool: BaseObjectPool, dataParser: DataParser = Ob
 	 * @param rawData - 原始贴图集数据。
 	 * @param textureAtlas - 贴图集对象。
 	 * @param name - 为该实例指定一个缓存名称，以便可以通过此名称获取该实例。 （如果未设置，则使用该实例中的名称）
-	 * @param scale - 为贴图集指定一个缩放值。 （默认: 1.0）
+	 * @param scale - 为贴图集指定一个缩放值。 （默认: 1f）
 	 * @returns TextureAtlasData 实例
 	 * @see #getTextureAtlasData()
 	 * @see #addTextureAtlasData()
@@ -415,7 +415,7 @@ abstract class BaseFactory(val pool: BaseObjectPool, dataParser: DataParser = Ob
 	 * @version DragonBones 4.5
 	 * @language zh_CN
 	 */
-	fun parseTextureAtlasData(rawData: Any, textureAtlas: Any, name: String? = null, scale: Double = 1.0): TextureAtlasData {
+	fun parseTextureAtlasData(rawData: Any, textureAtlas: Any, name: String? = null, scale: Float = 1f): TextureAtlasData {
 		val textureAtlasData = this._buildTextureAtlasData(null, null)
 		this._dataParser.parseTextureAtlasData(rawData, textureAtlasData, scale)
 		this._buildTextureAtlasData(textureAtlasData, textureAtlas)
@@ -723,7 +723,7 @@ abstract class BaseFactory(val pool: BaseObjectPool, dataParser: DataParser = Ob
 		this._buildSlots(dataPackage, armature)
 		this._buildConstraints(dataPackage, armature)
 		armature.invalidUpdate(null, true)
-		armature.advanceTime(0.0) // Update armature pose.
+		armature.advanceTime(0f) // Update armature pose.
 
 		return armature
 	}

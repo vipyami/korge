@@ -13,7 +13,7 @@ class Button(factory: UIFactory, skin: UISkin = factory.skin, initialText: Strin
 	var over = false
 	var down = false
 	private val bgView =
-		NinePatch(skin.buttonOut, width, height, 0.25, 0.25, 0.25, 0.25).apply { this@Button += this }
+		NinePatch(skin.buttonOut, width, height, 0.25f, 0.25f, 0.25f, 0.25f).apply { this@Button += this }
 	private val textView = Text(initialText).apply { this@Button += this }
 
 	override var text: String by redirectField(textView::text)
@@ -55,7 +55,7 @@ class Button(factory: UIFactory, skin: UISkin = factory.skin, initialText: Strin
 		}
 		bgView.width = width
 		bgView.height = height
-		textView.textBounds.setTo(0, 0, width, height)
+		textView.textBounds.setTo(0f, 0f, width, height)
 	}
 
 	override fun updateSize() {

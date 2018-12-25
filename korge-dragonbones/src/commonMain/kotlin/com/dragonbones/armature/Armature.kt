@@ -34,6 +34,7 @@ import com.dragonbones.util.*
 import com.soywiz.kds.*
 import com.soywiz.korio.ds.*
 
+
 /**
  * - Armature is the core of the skeleton animation system.
  * @see dragonBones.ArmatureData
@@ -105,11 +106,11 @@ class Armature(pool: BaseObjectPool) : BaseObject(pool), IAnimatable {
 	 * @internal
 	 */
 	var _cacheFrameIndex: Int = -1
-	private var _alpha: Double = 1.0
+	private var _alpha: Float = 1f
 	/**
 	 * @internal
 	 */
-	var _globalAlpha: Double = 1.0
+	var _globalAlpha: Float = 1f
 	private val _bones: ArrayList<Bone> = arrayListOf()
 	private val _slots: ArrayList<Slot> = arrayListOf()
 	/**
@@ -162,8 +163,8 @@ class Armature(pool: BaseObjectPool) : BaseObject(pool), IAnimatable {
 		this._flipX = false
 		this._flipY = false
 		this._cacheFrameIndex = -1
-		this._alpha = 1.0
-		this._globalAlpha = 1.0
+		this._alpha = 1f
+		this._globalAlpha = 1f
 		this._bones.lengthSet = 0
 		this._slots.lengthSet = 0
 		this._constraints.lengthSet = 0
@@ -297,7 +298,7 @@ class Armature(pool: BaseObjectPool) : BaseObject(pool), IAnimatable {
 		this._animation?.animations = this._armatureData?.animations!!
 	}
 
-	override fun advanceTime(passedTime: Double) {
+	override fun advanceTime(passedTime: Float) {
 		_advanceTime(passedTime)
 		for (slot in _slots) {
 			slot.childArmature?.advanceTime(passedTime)
@@ -308,7 +309,7 @@ class Armature(pool: BaseObjectPool) : BaseObject(pool), IAnimatable {
 	/**
 	 * @inheritDoc
 	 */
-	private fun _advanceTime(passedTime: Double) {
+	private fun _advanceTime(passedTime: Float) {
 		if (this._lockUpdate) {
 			return
 		}
@@ -343,7 +344,7 @@ class Armature(pool: BaseObjectPool) : BaseObject(pool), IAnimatable {
 		// Update alpha.
 		if (this._alphaDirty) {
 			this._alphaDirty = false
-			this._globalAlpha = this._alpha * (this._parent?._globalAlpha ?: 1.0)
+			this._globalAlpha = this._alpha * (this._parent?._globalAlpha ?: 1f)
 
 			for (n in 0 until _bones.size) {
 				_bones[n]._updateAlpha()
@@ -462,7 +463,7 @@ class Armature(pool: BaseObjectPool) : BaseObject(pool), IAnimatable {
 	 * @version DragonBones 5.0
 	 * @language zh_CN
 	 */
-	fun containsPoint(x: Double, y: Double): Slot? {
+	fun containsPoint(x: Float, y: Float): Slot? {
 		for (slot in this._slots) {
 			if (slot.containsPoint(x, y)) {
 				return slot
@@ -502,20 +503,20 @@ class Armature(pool: BaseObjectPool) : BaseObject(pool), IAnimatable {
 	 * @language zh_CN
 	 */
 	fun intersectsSegment(
-		xA: Double, yA: Double, xB: Double, yB: Double,
+		xA: Float, yA: Float, xB: Float, yB: Float,
 		intersectionPointA: Point? = null,
 		intersectionPointB: Point? = null,
 		normalRadians: Point? = null
 	): Slot? {
 		val isV = xA == xB
-		var dMin = 0.0
-		var dMax = 0.0
-		var intXA = 0.0
-		var intYA = 0.0
-		var intXB = 0.0
-		var intYB = 0.0
-		var intAN = 0.0
-		var intBN = 0.0
+		var dMin = 0f
+		var dMax = 0f
+		var intXA = 0f
+		var intYA = 0f
+		var intXB = 0f
+		var intYB = 0f
+		var intAN = 0f
+		var intBN = 0f
 		var intSlotA: Slot? = null
 		var intSlotB: Slot? = null
 
@@ -525,36 +526,36 @@ class Armature(pool: BaseObjectPool) : BaseObject(pool), IAnimatable {
 				if (intersectionPointA != null || intersectionPointB != null) {
 					if (intersectionPointA != null) {
 						var d = if (isV) intersectionPointA.y - yA else intersectionPointA.x - xA
-						if (d < 0.0) {
+						if (d < 0f) {
 							d = -d
 						}
 
 						if (intSlotA == null || d < dMin) {
 							dMin = d
-							intXA = intersectionPointA.x.toDouble()
-							intYA = intersectionPointA.y.toDouble()
+							intXA = intersectionPointA.x
+							intYA = intersectionPointA.y
 							intSlotA = slot
 
 							if (normalRadians != null) {
-								intAN = normalRadians.x.toDouble()
+								intAN = normalRadians.x
 							}
 						}
 					}
 
 					if (intersectionPointB != null) {
 						var d = intersectionPointB.x - xA
-						if (d < 0.0) {
+						if (d < 0f) {
 							d = -d
 						}
 
 						if (intSlotB == null || d > dMax) {
 							dMax = d
-							intXB = intersectionPointB.x.toDouble()
-							intYB = intersectionPointB.y.toDouble()
+							intXB = intersectionPointB.x
+							intYB = intersectionPointB.y
 							intSlotB = slot
 
 							if (normalRadians != null) {
-								intBN = normalRadians.y.toDouble()
+								intBN = normalRadians.y
 							}
 						}
 					}
@@ -567,20 +568,20 @@ class Armature(pool: BaseObjectPool) : BaseObject(pool), IAnimatable {
 		}
 
 		if (intSlotA != null && intersectionPointA != null) {
-			intersectionPointA.x = intXA.toFloat()
-			intersectionPointA.y = intYA.toFloat()
+			intersectionPointA.x = intXA
+			intersectionPointA.y = intYA
 
 			if (normalRadians != null) {
-				normalRadians.x = intAN.toFloat()
+				normalRadians.x = intAN
 			}
 		}
 
 		if (intSlotB != null && intersectionPointB != null) {
-			intersectionPointB.x = intXB.toFloat()
-			intersectionPointB.y = intYB.toFloat()
+			intersectionPointB.x = intXB
+			intersectionPointB.y = intYB
 
 			if (normalRadians != null) {
-				normalRadians.y = intBN.toFloat()
+				normalRadians.y = intBN
 			}
 		}
 
@@ -625,7 +626,7 @@ class Armature(pool: BaseObjectPool) : BaseObject(pool), IAnimatable {
 	 */
 	fun getBoneByDisplay(display: Any): Bone? {
 		val slot = this.getSlotByDisplay(display)
-		return if (slot != null) slot.parent else null
+		return slot?.parent
 	}
 	/**
 	 * - Get a specific slot.

@@ -17,7 +17,7 @@ class Label(factory: UIFactory, skin: UISkin = factory.skin, initialText: String
 	}
 
 	override fun updateSize() {
-		textView.textBounds.setTo(0, 0, width, height)
+		textView.textBounds.setTo(0f, 0f, width, height)
 	}
 
 }

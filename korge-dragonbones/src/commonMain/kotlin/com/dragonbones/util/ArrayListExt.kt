@@ -7,7 +7,7 @@ var IntArrayList.lengthSet: Int
 	set(value) = run { size = value }
 
 
-var DoubleArrayList.lengthSet: Int
+var FloatArrayList.lengthSet: Int
 	get() = size
 	set(value) = run { size = value }
 
@@ -15,7 +15,7 @@ var IntArrayList.length: Int
 	get() = size
 	set(value) = run { size = value }
 
-var DoubleArrayList.length: Int
+var FloatArrayList.length: Int
 	get() = size
 	set(value) = run { size = value }
 
@@ -39,7 +39,7 @@ fun <T> ArrayList<T>.unshift(value: T) {
 	this.add(0, value)
 }
 
-fun DoubleArrayList.push(value: Double) = this.add(value)
+fun FloatArrayList.push(value: Float) = this.add(value)
 fun IntArrayList.push(value: Int) = this.add(value)
 
 fun <T> MutableList<T>.splice(removeOffset: Int, removeCount: Int, vararg itemsToAdd: T) {

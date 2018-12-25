@@ -18,9 +18,9 @@ class TimerComponentsTest {
 			}
 		}
 		assertEquals("a", log)
-		view.updateSingleView(7.0)
+		view.updateSingleView(7.milliseconds)
 		assertEquals("ab", log)
-		view.updateSingleView(3.0)
+		view.updateSingleView(3.milliseconds)
 		assertEquals("abc", log)
 	}
 }

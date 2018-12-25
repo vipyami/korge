@@ -3,7 +3,7 @@ package com.soywiz.korge.view
 import com.soywiz.kmem.*
 import com.soywiz.korge.render.*
 import com.soywiz.korio.util.*
-import com.soywiz.korma.*
+
 import com.soywiz.korma.geom.*
 import com.soywiz.korui.event.*
 import kotlin.reflect.*
@@ -83,7 +83,7 @@ open class Container : View() {
 		if (view.parent == this) view.removeFromParent()
 	}
 
-	private val tempMatrix = Matrix2d()
+	private val tempMatrix = Matrix()
 	override fun renderInternal(ctx: RenderContext) {
 		if (!visible) return
 		safeForEachChildren { child ->
@@ -91,7 +91,7 @@ open class Container : View() {
 		}
 	}
 
-	override fun hitTest(x: Double, y: Double): View? {
+	override fun hitTest(x: Float, y: Float): View? {
 		for (child in children.reversed().filter(View::visible)) return child.hitTest(x, y) ?: continue
 		return null
 	}
@@ -143,9 +143,9 @@ open class Container : View() {
 fun <T : View> T.addTo(parent: Container) = this.apply { parent += this }
 
 inline fun Container.fixedSizeContainer(width: Number, height: Number, callback: @ViewsDslMarker FixedSizeContainer.() -> Unit = {}) =
-	FixedSizeContainer(width.toDouble(), height.toDouble()).addTo(this).apply(callback)
+	FixedSizeContainer(width.toFloat(), height.toFloat()).addTo(this).apply(callback)
 
-open class FixedSizeContainer(override var width: Double = 100.0, override var height: Double = 100.0) : Container() {
+open class FixedSizeContainer(override var width: Float = 100f, override var height: Float = 100f) : Container() {
 	override fun getLocalBoundsInternal(out: Rectangle): Unit = Unit.run { out.setTo(0, 0, width, height) }
 
 	override fun toString(): String {

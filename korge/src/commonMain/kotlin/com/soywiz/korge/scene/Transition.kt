@@ -18,7 +18,7 @@ class TransitionView() : Container() {
 	val next: View get() = children[1]
 
 	fun startNewTransition(next: View) {
-		this.ratio = 0.0
+		this.ratio = 0f
 		setViews(this.next, next)
 	}
 
@@ -37,7 +37,7 @@ class TransitionView() : Container() {
 	}
 }
 
-class Transition(val render: (ctx: RenderContext, prev: View, next: View, ratio: Double) -> Unit)
+class Transition(val render: (ctx: RenderContext, prev: View, next: View, ratio: Float) -> Unit)
 
 fun Transition.withEasing(easing: Easing) = Transition { ctx, prev, next, ratio ->
 	this@withEasing.render(ctx, prev, next, easing(ratio))
@@ -47,7 +47,7 @@ val AlphaTransition = Transition { ctx, prev, next, ratio ->
 	val prevAlpha = prev.alpha
 	val nextAlpha = next.alpha
 	try {
-		prev.alpha = 1.0 - ratio
+		prev.alpha = 1f - ratio
 		next.alpha = ratio
 		prev.render(ctx)
 		next.render(ctx)

@@ -26,7 +26,7 @@ class GridViewList(
 		val n = container.children.size
 		val item = row0.clone()
 		container += item
-		item.setMatrixInterpolated(n.toDouble(), row0.localMatrix, row1.localMatrix)
+		item.setMatrixInterpolated(n.toFloat(), row0.localMatrix, row1.localMatrix)
 		val select = cellSelector(item)
 		rowsData += ViewList(select.first, select.second, columns)
 	}

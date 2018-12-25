@@ -1,6 +1,7 @@
 package com.soywiz.korge.animate.serialization
 
 import com.soywiz.kds.*
+import com.soywiz.klock.*
 import com.soywiz.kmem.*
 import com.soywiz.korau.sound.*
 import com.soywiz.korge.animate.*
@@ -14,8 +15,9 @@ import com.soywiz.korio.file.*
 import com.soywiz.korio.serialization.json.*
 import com.soywiz.korio.stream.*
 import com.soywiz.korio.file.*
-import com.soywiz.korma.*
+
 import com.soywiz.korma.geom.*
+import com.soywiz.korma.geom.vector.*
 
 suspend fun VfsFile.readAni(views: Views, content: FastByteArrayInputStream? = null): AnLibrary {
 	val file = this
@@ -125,12 +127,12 @@ object AnLibraryDeserializer {
 						val cmds = IntArray(readU_VL())
 						for (n in 0 until cmds.size) cmds[n] = readU8()
 
-						val data = DoubleArray(readU_VL())
-						for (n in 0 until data.size) data[n] = readF32LE().toDouble()
+						val data = FloatArray(readU_VL())
+						for (n in 0 until data.size) data[n] = readF32LE()
 
 						//val cmds = (0 until readU_VL()).map { readU8() }.toIntArray()
 						//val data = (0 until readU_VL()).map { readF32LE().toDouble() }.toDoubleArray()
-						VectorPath(IntArrayList(*cmds), DoubleArrayList(*data))
+						VectorPath(IntArrayList(*cmds), FloatArrayList(*data))
 					}
 					else -> null
 				}
@@ -161,7 +163,7 @@ object AnLibraryDeserializer {
 					val texture = atlas.second
 
 					texturesWithBitmap.add(
-						ratio1000, TextureWithBitmapSlice(
+						ratio1000.microseconds, TextureWithBitmapSlice(
 							texture = texture.slice(textureBounds),
 							bitmapSlice = bitmap.slice(textureBounds),
 							scale = scale,
@@ -216,7 +218,7 @@ object AnLibraryDeserializer {
 		val symbolStates = (0 until readU_VL()).map {
 			val ss = AnSymbolMovieClipSubTimeline(totalDepths)
 			//ss.name = strings[readU_VL()] ?: ""
-			ss.totalTime = readU_VL()
+			ss.totalTime = readU_VL().microseconds
 			val stateFlags = readU8()
 			ss.nextStatePlay = stateFlags.extract(0)
 			ss.nextState = strings[readU_VL()]
@@ -239,7 +241,7 @@ object AnLibraryDeserializer {
 						else -> TODO()
 					}
 				}
-				for (action in actions) ss.actions.add(timeInMs * 1000, action)
+				for (action in actions) ss.actions.add(timeInMs.milliseconds, action)
 			}
 
 			for (depth in 0 until totalDepths) {
@@ -247,9 +249,9 @@ object AnLibraryDeserializer {
 				var lastUid = -1
 				var lastName: String? = null
 				var lastColorTransform = ColorTransform()
-				var lastMatrix = Matrix2d()
+				var lastMatrix = Matrix()
 				var lastClipDepth = -1
-				var lastRatio = 0.0
+				var lastRatio = 0f
 				var lastFrameTime = 0
 				var lastBlendMode = BlendMode.INHERIT
 				for (frameIndex in 0 until readU_VL()) {
@@ -271,15 +273,15 @@ object AnLibraryDeserializer {
 					if (hasName) lastName = strings[readU_VL()]
 					if (hasAlpha) {
 						val ct = lastColorTransform.copy()
-						ct.mA = readU8().toDouble() / 255.0
+						ct.mA = readU8().toFloat() / 255f
 						lastColorTransform = ct
 					} else if (hasColorTransform) {
 						val ct = lastColorTransform.copy()
 						val ctFlags = readU8()
-						if (ctFlags.extract(0)) ct.mR = readU8().toDouble() / 255.0
-						if (ctFlags.extract(1)) ct.mG = readU8().toDouble() / 255.0
-						if (ctFlags.extract(2)) ct.mB = readU8().toDouble() / 255.0
-						if (ctFlags.extract(3)) ct.mA = readU8().toDouble() / 255.0
+						if (ctFlags.extract(0)) ct.mR = readU8().toFloat() / 255f
+						if (ctFlags.extract(1)) ct.mG = readU8().toFloat() / 255f
+						if (ctFlags.extract(2)) ct.mB = readU8().toFloat() / 255f
+						if (ctFlags.extract(3)) ct.mA = readU8().toFloat() / 255f
 						if (ctFlags.extract(4)) ct.aR = readS8() * 2
 						if (ctFlags.extract(5)) ct.aG = readS8() * 2
 						if (ctFlags.extract(6)) ct.aB = readS8() * 2
@@ -290,20 +292,20 @@ object AnLibraryDeserializer {
 					if (hasMatrix) {
 						val lm = lastMatrix.copy()
 						val matrixFlags = readU8()
-						if (matrixFlags.extract(0)) lm.a = readS_VL().toDouble() / 16384.0
-						if (matrixFlags.extract(1)) lm.b = readS_VL().toDouble() / 16384.0
-						if (matrixFlags.extract(2)) lm.c = readS_VL().toDouble() / 16384.0
-						if (matrixFlags.extract(3)) lm.d = readS_VL().toDouble() / 16384.0
-						if (matrixFlags.extract(4)) lm.tx = readS_VL().toDouble() / 20.0
-						if (matrixFlags.extract(5)) lm.ty = readS_VL().toDouble() / 20.0
+						if (matrixFlags.extract(0)) lm.a = (readS_VL().toDouble() / 16384.0).toFloat()
+						if (matrixFlags.extract(1)) lm.b = (readS_VL().toDouble() / 16384.0).toFloat()
+						if (matrixFlags.extract(2)) lm.c = (readS_VL().toDouble() / 16384.0).toFloat()
+						if (matrixFlags.extract(3)) lm.d = (readS_VL().toDouble() / 16384.0).toFloat()
+						if (matrixFlags.extract(4)) lm.tx = (readS_VL().toDouble() / 20.0).toFloat()
+						if (matrixFlags.extract(5)) lm.ty = (readS_VL().toDouble() / 20.0).toFloat()
 						lastMatrix = lm
 					}
-					if (hasRatio) lastRatio = readU8().toDouble() / 255.0
+					if (hasRatio) lastRatio = readU8().toFloat() / 255f
 					if (hasBlendMode) {
 						lastBlendMode = BlendMode.BY_ORDINAL[readU8()] ?: BlendMode.INHERIT
 					}
 					timeline.add(
-						frameTime * 1000, AnSymbolTimelineFrame(
+						frameTime.milliseconds, AnSymbolTimelineFrame(
 							depth = depth,
 							uid = lastUid,
 							transform = lastMatrix,
@@ -322,7 +324,7 @@ object AnLibraryDeserializer {
 		for (n in 0 until uidsToCharacterIds.size) mc.uidInfo[n] = uidsToCharacterIds[n]
 		mc.states += (0 until readU_VL()).map {
 			val name = strings[readU_VL()] ?: ""
-			val startTime = readU_VL()
+			val startTime = readU_VL().microseconds
 			val stateIndex = readU_VL()
 			symbolStates[stateIndex].actions.add(startTime, AnEventAction(name))
 			//println("$startTime, $name")

@@ -4,15 +4,15 @@ import kotlin.math.*
 
 @Suppress("unused")
 interface Easing {
-	operator fun invoke(it: Double): Double
+	operator fun invoke(it: Float): Float
 
 	companion object {
-		fun cubic(f: (t: Double, b: Double, c: Double, d: Double) -> Double): Easing = Easing { f(it, 0.0, 1.0, 1.0) }
+		fun cubic(f: (t: Float, b: Float, c: Float, d: Float) -> Float): Easing = Easing { f(it, 0f, 1f, 1f) }
 		fun combine(start: Easing, end: Easing) =
-			Easing { if (it < 0.5) 0.5 * start(it * 2.0) else 0.5 * end((it - 0.5) * 2.0) + 0.5 }
+			Easing { if (it < 0.5f) 0.5f * start(it * 2f) else 0f * end((it - 0f) * 2f) + 0.5f }
 
-		operator fun invoke(f: (Double) -> Double) = object : Easing {
-			override fun invoke(it: Double): Double = f(it)
+		operator fun invoke(f: (Float) -> Float) = object : Easing {
+			override fun invoke(it: Float): Float = f(it)
 		}
 
 		val EASE_IN_ELASTIC get() = Easings.EASE_IN_ELASTIC
@@ -40,57 +40,55 @@ interface Easing {
 }
 
 private object Easings {
-	private const val BOUNCE_10 = 1.70158
+	private const val BOUNCE_10 = 1.70158f
+	private const val PI = kotlin.math.PI.toFloat()
 
 	val EASE_IN_ELASTIC = Easing {
-		if (it == 0.0 || it == 1.0) it else {
-			val p = 0.3
-			val s = p / 4.0
+		if (it == 0f || it == 1f) it else {
+			val p = 0.3f
+			val s = p / 4.0f
 			val inv = it - 1
-			-1.0 * 2.0.pow(10.0 * inv) * sin((inv - s) * (2.0 * PI) / p)
+			-1f * 2f.pow(10f * inv) * sin((inv - s) * (2f * PI) / p)
 		}
 	}
 
 	val EASE_OUT_ELASTIC = Easing {
-		if (it == 0.0 || it == 1.0) it else {
-			val p = 0.3
-			val s = p / 4.0
-			2.0.pow(-10.0 * it) * sin((it - s) * (2.0 * PI) / p) + 1
+		if (it == 0f || it == 1f) it else {
+			val p = 0.3f
+			val s = p / 4.0f
+			2f.pow(-10f * it) * sin((it - s) * (2f * PI) / p) + 1
 		}
 	}
 
 	val EASE_OUT_BOUNCE = Easing {
-		val s = 7.5625
-		val p = 2.75
-		if (it < (1.0 / p)) {
-			s * it.pow(2.0)
-		} else if (it < (2.0 / p)) {
-			s * (it - 1.5 / p).pow(2.0) + 0.75
-		} else if (it < 2.5 / p) {
-			s * (it - 2.25 / p).pow(2.0) + 0.9375
-		} else {
-			s * (it - 2.625 / p).pow(2.0) + 0.984375
+		val s = 7.5625f
+		val p = 2.75f
+		when {
+			it < (1.0 / p) -> s * it.pow(2f)
+			it < (2.0 / p) -> s * (it - 1.5f / p).pow(2.0f) + 0.75f
+			it < 2.5 / p -> s * (it - 2.25f / p).pow(2.0f) + 0.9375f
+			else -> s * (it - 2.625f / p).pow(2.0f) + 0.984375f
 		}
 	}
 
 	val LINEAR = Easing { it }
 	val EASE_IN = Easing { it * it * it }
-	val EASE_OUT = Easing { val inv = it - 1.0; inv * inv * inv + 1 }
+	val EASE_OUT = Easing { val inv = it - 1.0f; inv * inv * inv + 1 }
 	val EASE_IN_OUT = Easing.combine(EASE_IN, EASE_OUT)
 	val EASE_OUT_IN = Easing.combine(EASE_OUT, EASE_IN)
-	val EASE_IN_BACK = Easing { it.pow(2.0) * ((BOUNCE_10 + 1.0) * it - BOUNCE_10) }
-	val EASE_OUT_BACK = Easing { val inv = it - 1.0; inv.pow(2.0) * ((BOUNCE_10 + 1.0) * inv + BOUNCE_10) + 1.0 }
+	val EASE_IN_BACK = Easing { it.pow(2.0f) * ((BOUNCE_10 + 1.0f) * it - BOUNCE_10) }
+	val EASE_OUT_BACK = Easing { val inv = it - 1.0f; inv.pow(2.0f) * ((BOUNCE_10 + 1.0f) * inv + BOUNCE_10) + 1.0f }
 	val EASE_IN_OUT_BACK = Easing.combine(EASE_IN_BACK, EASE_OUT_BACK)
 	val EASE_OUT_IN_BACK = Easing.combine(EASE_OUT_BACK, EASE_IN_BACK)
 	val EASE_IN_OUT_ELASTIC = Easing.combine(EASE_IN_ELASTIC, EASE_OUT_ELASTIC)
 	val EASE_OUT_IN_ELASTIC = Easing.combine(EASE_OUT_ELASTIC, EASE_IN_ELASTIC)
-	val EASE_IN_BOUNCE = Easing { 1.0 - EASE_OUT_BOUNCE(1.0 - it) }
+	val EASE_IN_BOUNCE = Easing { 1.0f - EASE_OUT_BOUNCE(1.0f - it) }
 	val EASE_IN_OUT_BOUNCE = Easing.combine(EASE_IN_BOUNCE, EASE_OUT_BOUNCE)
 	val EASE_OUT_IN_BOUNCE = Easing.combine(EASE_OUT_BOUNCE, EASE_IN_BOUNCE)
-	val EASE_IN_QUAD = Easing { 1.0 * it * it }
-	val EASE_OUT_QUAD = Easing { -1.0 * it * (it - 2) }
+	val EASE_IN_QUAD = Easing { 1.0f * it * it }
+	val EASE_OUT_QUAD = Easing { -1.0f * it * (it - 2) }
 	val EASE_IN_OUT_QUAD =
-		Easing { val t = it * 2.0; if (t < 1) (1.0 / 2 * t * t) else (-1.0 / 2 * ((t - 1) * ((t - 1) - 2) - 1)) }
+		Easing { val t = it * 2.0f; if (t < 1) (1.0f / 2f * t * t) else (-1.0f / 2f * ((t - 1) * ((t - 1) - 2) - 1)) }
 
 	val EASE_SINE = Easing { sin(it) }
 }
@@ -231,15 +229,15 @@ e: java.lang.NullPointerException
 
 @Suppress("unused")
 interface Easing {
-	operator fun invoke(it: Double): Double
+	operator fun invoke(it: Float): Float
 
 	companion object {
-		fun cubic(f: (t: Double, b: Double, c: Double, d: Double) -> Double): Easing = Easing { f(it, 0.0, 1.0, 1.0) }
+		fun cubic(f: (t: Float, b: Float, c: Float, d: Float) -> Double): Easing = Easing { f(it, 0.0, 1.0, 1.0) }
 		fun combine(start: Easing, end: Easing) =
 			Easing { if (it < 0.5) 0.5 * start(it * 2.0) else 0.5 * end((it - 0.5) * 2.0) + 0.5 }
 
 		operator fun invoke(f: (Double) -> Double) = object : Easing {
-			override fun invoke(it: Double): Double = f(it)
+			override fun invoke(it: Float): Float = f(it)
 		}
 
 		inline val EASE_IN_ELASTIC get() = Easings.EASE_IN_ELASTIC

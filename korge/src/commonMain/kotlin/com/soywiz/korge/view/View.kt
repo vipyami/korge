@@ -1,6 +1,7 @@
 package com.soywiz.korge.view
 
 import com.soywiz.kds.*
+import com.soywiz.klock.*
 import com.soywiz.korge.component.*
 import com.soywiz.korge.render.*
 import com.soywiz.korge.view.filter.*
@@ -12,7 +13,7 @@ import com.soywiz.korio.error.*
 import com.soywiz.korio.file.std.*
 import com.soywiz.korio.lang.*
 import com.soywiz.korio.util.*
-import com.soywiz.korma.*
+
 import com.soywiz.korma.geom.*
 import com.soywiz.korui.event.*
 import kotlin.collections.ArrayList
@@ -52,7 +53,7 @@ abstract class View : Renderable, Extra by Extra.Mixin(), EventDispatcher by Eve
 	}
 
 	companion object {
-		private val identity = Matrix2d()
+		private val identity = Matrix()
 
 		fun commonAncestor(left: View?, right: View?): View? {
 			var l: View? = left
@@ -76,9 +77,9 @@ abstract class View : Renderable, Extra by Extra.Mixin(), EventDispatcher by Eve
 	/**
 	 * Property used for interpolable
 	 */
-	open var ratio: Double = 0.0
+	open var ratio: Float = 0f
 	var index: Int = 0; internal set
-	var speed: Double = 1.0
+	var speed: Float = 1f
 	var parent: Container? = null; internal set
 	var name: String? = null
 	var blendMode: BlendMode = BlendMode.INHERIT
@@ -89,73 +90,73 @@ abstract class View : Renderable, Extra by Extra.Mixin(), EventDispatcher by Eve
 			}
 		}
 
-	val globalSpeed: Double get() = if (parent != null) parent!!.globalSpeed * speed else speed
+	val globalSpeed: Float get() = if (parent != null) parent!!.globalSpeed * speed else speed
 
-	private var _scaleX: Double = 1.0
-	private var _scaleY: Double = 1.0
-	private var _skewX: Double = 0.0
-	private var _skewY: Double = 0.0
-	private var _rotation: Double = 0.0
+	private var _scaleX: Float = 1f
+	private var _scaleY: Float = 1f
+	private var _skewX: Float = 0f
+	private var _skewY: Float = 0f
+	private var _rotation: Float = 0f
 
-	val pos = MPoint2d()
+	val pos = Point()
 
-	var x: Double
+	var x: Float
 		get() = ensureTransform().pos.x
 		set(v) = run { ensureTransform(); if (pos.x != v) run { pos.x = v; invalidateMatrix() } }
-	var y: Double
+	var y: Float
 		get() = ensureTransform().pos.y
 		set(v) = run { ensureTransform(); if (pos.y != v) run { pos.y = v; invalidateMatrix() } }
 
-	var scaleX: Double
+	var scaleX: Float
 		get() = ensureTransform()._scaleX
 		set(v) = run { ensureTransform(); if (_scaleX != v) run { _scaleX = v; invalidateMatrix() } }
-	var scaleY: Double
+	var scaleY: Float
 		get() = ensureTransform()._scaleY
 		set(v) = run { ensureTransform(); if (_scaleY != v) run { _scaleY = v; invalidateMatrix() } }
-	var scale: Double
-		get() = (scaleX + scaleY) / 2.0
+	var scale: Float
+		get() = (scaleX + scaleY) / 2f
 		set(v) = run { scaleX = v; scaleY = v }
 
-	var skewX: Double
+	var skewX: Float
 		get() = ensureTransform()._skewX
 		set(v) = run { ensureTransform(); if (_skewX != v) run { _skewX = v; invalidateMatrix() } }
-	var skewY: Double
+	var skewY: Float
 		get() = ensureTransform()._skewY
 		set(v) = run { ensureTransform(); if (_skewY != v) run { _skewY = v; invalidateMatrix() } }
 
 	var rotation: Angle
 		get() = rotationRadians.radians
 		set(v) = run { rotationRadians = v.radians }
-	var rotationRadians: Double
+	var rotationRadians: Float
 		get() = ensureTransform()._rotation
 		set(v) = run { ensureTransform(); if (_rotation != v) run { _rotation = v; invalidateMatrix() } }
-	var rotationDegrees: Double
+	var rotationDegrees: Float
 		get() = Angle.toDegrees(rotationRadians)
 		set(v) = run { rotationRadians = Angle.toRadians(v) }
 
-	var globalX: Double
+	var globalX: Float
 		get() = parent?.localToGlobalX(x, y) ?: x;
 		set(value) = run { x = parent?.globalToLocalX(value, globalY) ?: value }
-	var globalY: Double
+	var globalY: Float
 		get() = parent?.localToGlobalY(x, y) ?: y;
 		set(value) = run { y = parent?.globalToLocalY(globalX, value) ?: value }
 
-	fun setSize(width: Double, height: Double) = _setSize(width, true, height, true)
+	fun setSize(width: Float, height: Float) = _setSize(width, true, height, true)
 
-	private fun _setSize(width: Double, swidth: Boolean, height: Double, sheight: Boolean) {
+	private fun _setSize(width: Float, swidth: Boolean, height: Float, sheight: Boolean) {
 		//val bounds = parent?.getLocalBounds() ?: this.getLocalBounds()
 		val bounds = this.getLocalBounds()
 		if (swidth) scaleX = width / bounds.width
 		if (sheight) scaleY = height / bounds.height
 	}
 
-	open var width: Double
+	open var width: Float
 		get() = getLocalBounds().width * scaleX
-		set(value) { _setSize(value, true, 0.0, false) }
+		set(value) { _setSize(value, true, 0f, false) }
 
-	open var height: Double
+	open var height: Float
 		get() = getLocalBounds().height * scaleY
-		set(value) { _setSize(0.0, false, value, true) }
+		set(value) { _setSize(0f, false, value, true) }
 
 	var colorMul: RGBA
 		get() = RGBA(colorMulInt)
@@ -169,7 +170,7 @@ abstract class View : Renderable, Extra by Extra.Mixin(), EventDispatcher by Eve
 		get() = _colorTransform.colorAdd;
 		set(v) = run { _colorTransform.colorAdd = v }.also { invalidate() }
 
-	var alpha: Double get() = _colorTransform.mA; set(v) = run { _colorTransform.mA = v; invalidate() }
+	var alpha: Float get() = _colorTransform.mA; set(v) = run { _colorTransform.mA = v; invalidate() }
 
 	// alias
 	var tint: Int
@@ -183,7 +184,7 @@ abstract class View : Renderable, Extra by Extra.Mixin(), EventDispatcher by Eve
 	fun hasProp(key: String) = key in _props
 	fun getPropString(key: String, default: String = "") = _props[key] ?: default
 	fun getPropInt(key: String, default: Int = 0) = _props[key]?.toIntOrNull() ?: default
-	fun getPropDouble(key: String, default: Double = 0.0) = _props[key]?.toDoubleOrNull() ?: default
+	fun getPropDouble(key: String, default: Float = 0f) = _props[key]?.toDoubleOrNull() ?: default
 
 	fun addProp(key: String, value: String) {
 		_props[key] = value
@@ -198,8 +199,8 @@ abstract class View : Renderable, Extra by Extra.Mixin(), EventDispatcher by Eve
 	}
 	// endregion
 
-	private val tempTransform = Matrix2d.Transform()
-	//private val tempMatrix = Matrix2d()
+	private val tempTransform = Matrix.Transform()
+	//private val tempMatrix = Matrix()
 
 	private fun ensureTransform() = this.apply {
 		if (!validLocalProps) {
@@ -223,19 +224,19 @@ abstract class View : Renderable, Extra by Extra.Mixin(), EventDispatcher by Eve
 	var enabled: Boolean = true
 	var visible: Boolean = true
 
-	fun setMatrix(matrix: Matrix2d) {
+	fun setMatrix(matrix: Matrix) {
 		this._localMatrix.copyFrom(matrix)
 		this.validLocalProps = false
 		invalidate()
 	}
 
-	fun setMatrixInterpolated(ratio: Double, l: Matrix2d, r: Matrix2d) {
-		this._localMatrix.setToInterpolated(ratio, l, r)
+	fun setMatrixInterpolated(ratio: Float, l: Matrix, r: Matrix) {
+		this._localMatrix.setToInterpolated(l, r, ratio)
 		this.validLocalProps = false
 		invalidate()
 	}
 
-	fun setComputedTransform(transform: Matrix2d.Computed) {
+	fun setComputedTransform(transform: Matrix.Computed) {
 		_localMatrix.copyFrom(transform.matrix)
 		_setTransform(transform.transform)
 		invalidate()
@@ -243,22 +244,25 @@ abstract class View : Renderable, Extra by Extra.Mixin(), EventDispatcher by Eve
 		validLocalMatrix = true
 	}
 
-	fun setTransform(transform: Matrix2d.Transform) {
+	fun setTransform(transform: Matrix.Transform) {
 		_setTransform(transform)
 		invalidate()
 		validLocalProps = true
 		validLocalMatrix = false
 	}
 
-	fun _setTransform(t: Matrix2d.Transform) {
+	fun _setTransform(t: Matrix.Transform) {
 		//transform.toMatrix(_localMatrix)
-		pos.x = t.x; pos.y = t.y
-		_scaleX = t.scaleX; _scaleY = t.scaleY
-		_skewX = t.skewY; _skewY = t.skewY
+		pos.x = t.x
+		pos.y = t.y
+		_scaleX = t.scaleX
+		_scaleY = t.scaleY
+		_skewX = t.skewY
+		_skewY = t.skewY
 		_rotation = t.rotation
 	}
 
-	//fun setTransform(x: Double, y: Double, sx: Double, sy: Double, angle: Double, skewX: Double, skewY: Double, pivotX: Double = 0.0, pivotY: Double = 0.0) =
+	//fun setTransform(x: Float, y: Float, sx: Float, sy: Float, angle: Float, skewX: Float, skewY: Float, pivotX: Float = 0.0, pivotY: Float = 0.0) =
 	//	setTransform(tempTransform.setTo(x, y, sx, sy, skewX, skewY, angle))
 
 
@@ -304,12 +308,12 @@ abstract class View : Renderable, Extra by Extra.Mixin(), EventDispatcher by Eve
 		return c
 	}
 
-	fun addUpdatable(updatable: (dtMs: Int) -> Unit): Cancellable {
+	fun addUpdatable(updatable: (time: TimeSpan) -> Unit): Cancellable {
 		val component = object : UpdateComponent {
 			override val view: View get() = this@View
-			override fun update(ms: Double) = run { updatable(ms.toInt()) }
+			override fun update(time: TimeSpan) = run { updatable(time) }
 		}.attach()
-		component.update(0.0)
+		component.update(TimeSpan.ZERO)
 		return Cancellable { component.detach() }
 	}
 
@@ -325,8 +329,8 @@ abstract class View : Renderable, Extra by Extra.Mixin(), EventDispatcher by Eve
 	}
 // endregion
 
-	private var _localMatrix = Matrix2d()
-	var localMatrix: Matrix2d
+	private var _localMatrix = Matrix()
+	var localMatrix: Matrix
 		get() {
 			if (!validLocalMatrix) {
 				validLocalMatrix = true
@@ -340,9 +344,9 @@ abstract class View : Renderable, Extra by Extra.Mixin(), EventDispatcher by Eve
 			invalidate()
 		}
 
-	private var _globalMatrix = Matrix2d()
+	private var _globalMatrix = Matrix()
 	private var _globalMatrixVersion = -1
-	var globalMatrix: Matrix2d
+	var globalMatrix: Matrix
 		get() {
 			if (_globalMatrixVersion != this._version) {
 				_globalMatrixVersion = this._version
@@ -364,14 +368,14 @@ abstract class View : Renderable, Extra by Extra.Mixin(), EventDispatcher by Eve
 			}
 		}
 
-	private val _globalMatrixInv = Matrix2d()
+	private val _globalMatrixInv = Matrix()
 	private var _globalMatrixInvVersion = -1
-	val globalMatrixInv: Matrix2d
+	val globalMatrixInv: Matrix
 		get() {
 			if (_globalMatrixInvVersion != this._version) {
 				_globalMatrixInvVersion = this._version
 				_requireInvalidate = true
-				_globalMatrixInv.setToInverse(this.globalMatrix)
+				_globalMatrixInv.invert(this.globalMatrix)
 			}
 			return _globalMatrixInv
 		}
@@ -411,10 +415,10 @@ abstract class View : Renderable, Extra by Extra.Mixin(), EventDispatcher by Eve
 	val renderColorMulInt: Int get() = renderColorTransform.colorMulInt
 	val renderColorMul: RGBA get() = renderColorTransform.colorMul
 	val renderColorAdd: Int get() = renderColorTransform.colorAdd
-	val renderAlpha: Double get() = renderColorTransform.mA
+	val renderAlpha: Float get() = renderColorTransform.mA
 
-	fun localMouseX(views: Views): Double = this.globalMatrixInv.transformX(views.input.mouse)
-	fun localMouseY(views: Views): Double = this.globalMatrixInv.transformY(views.input.mouse)
+	fun localMouseX(views: Views): Float = this.globalMatrixInv.transformX(views.input.mouse)
+	fun localMouseY(views: Views): Float = this.globalMatrixInv.transformY(views.input.mouse)
 
 	fun invalidateMatrix() {
 		validLocalMatrix = false
@@ -473,69 +477,70 @@ abstract class View : Renderable, Extra by Extra.Mixin(), EventDispatcher by Eve
 	@Suppress("RemoveCurlyBracesFromTemplate")
 	override fun toString(): String {
 		var out = this::class.portableSimpleName
-		if (x != 0.0 || y != 0.0) out += ":pos=(${x.str},${y.str})"
-		if (scaleX != 1.0 || scaleY != 1.0) out += ":scale=(${scaleX.str},${scaleY.str})"
-		if (skewX != 0.0 || skewY != 0.0) out += ":skew=(${skewX.str},${skewY.str})"
-		if (rotationRadians != 0.0) out += ":rotation=(${rotationDegrees.str}º)"
+		if (x != 0f || y != 0f) out += ":pos=(${x.str},${y.str})"
+		if (scaleX != 1f || scaleY != 1f) out += ":scale=(${scaleX.str},${scaleY.str})"
+		if (skewX != 0f || skewY != 0f) out += ":skew=(${skewX.str},${skewY.str})"
+		if (rotationRadians != 0f) out += ":rotation=(${rotationDegrees.str}º)"
 		if (name != null) out += ":name=($name)"
 		if (blendMode != BlendMode.INHERIT) out += ":blendMode=($blendMode)"
 		if (!visible) out += ":visible=$visible"
-		if (alpha != 1.0) out += ":alpha=$alpha"
+		if (alpha != 1f) out += ":alpha=$alpha"
 		if (colorMul.rgb != Colors.WHITE.rgb) out += ":colorMul=${colorMul.hexString}"
 		if (colorAdd != 0x7f7f7f7f) out += ":colorAdd=${colorAdd.shex}"
 		return out
 	}
 
 	protected val Double.str get() = this.toString(2, skipTrailingZeros = true)
+	protected val Float.str get() = this.toDouble().toString(2, skipTrailingZeros = true)
 
 	// Version with root-most object as reference
-	fun globalToLocal(p: Point2d, out: MPoint2d = MPoint2d()): MPoint2d = globalToLocalXY(p.x, p.y, out)
-	fun globalToLocalXY(x: Double, y: Double, out: MPoint2d = MPoint2d()): MPoint2d = this.globalMatrixInv.transform(x, y, out)
+	fun globalToLocal(p: IPoint, out: Point = Point()): Point = globalToLocalXY(p.x, p.y, out)
+	fun globalToLocalXY(x: Float, y: Float, out: Point = Point()): Point = this.globalMatrixInv.transform(x, y, out)
 
-	fun globalToLocalX(x: Double, y: Double): Double = this.globalMatrixInv.transformX(x, y)
-	fun globalToLocalY(x: Double, y: Double): Double = this.globalMatrixInv.transformY(x, y)
+	fun globalToLocalX(x: Float, y: Float): Float = this.globalMatrixInv.transformX(x, y)
+	fun globalToLocalY(x: Float, y: Float): Float = this.globalMatrixInv.transformY(x, y)
 
-	fun localToGlobal(p: Point2d, out: MPoint2d = MPoint2d()): MPoint2d = localToGlobalXY(p.x, p.y, out)
-	fun localToGlobalXY(x: Double, y: Double, out: MPoint2d = MPoint2d()): MPoint2d = this.globalMatrix.transform(x, y, out)
-	fun localToGlobalX(x: Double, y: Double): Double = this.globalMatrix.transformX(x, y)
-	fun localToGlobalY(x: Double, y: Double): Double = this.globalMatrix.transformY(x, y)
+	fun localToGlobal(p: IPoint, out: Point = Point()): Point = localToGlobalXY(p.x, p.y, out)
+	fun localToGlobalXY(x: Float, y: Float, out: Point = Point()): Point = this.globalMatrix.transform(x, y, out)
+	fun localToGlobalX(x: Float, y: Float): Float = this.globalMatrix.transformX(x, y)
+	fun localToGlobalY(x: Float, y: Float): Float = this.globalMatrix.transformY(x, y)
 
 	// Version with View.Reference as reference
-	fun renderToLocal(p: Point2d, out: MPoint2d = MPoint2d()): MPoint2d = renderToLocalXY(p.x, p.y, out)
-	fun renderToLocalXY(x: Double, y: Double, out: MPoint2d = MPoint2d()): MPoint2d = this.globalMatrixInv.transform(x, y, out)
+	fun renderToLocal(p: IPoint, out: Point = Point()): Point = renderToLocalXY(p.x, p.y, out)
+	fun renderToLocalXY(x: Float, y: Float, out: Point = Point()): Point = this.globalMatrixInv.transform(x, y, out)
 
-	fun renderToLocalX(x: Double, y: Double): Double = this.globalMatrixInv.transformX(x, y)
-	fun renderToLocalY(x: Double, y: Double): Double = this.globalMatrixInv.transformY(x, y)
+	fun renderToLocalX(x: Float, y: Float): Float = this.globalMatrixInv.transformX(x, y)
+	fun renderToLocalY(x: Float, y: Float): Float = this.globalMatrixInv.transformY(x, y)
 
-	fun localToRender(p: Point2d, out: MPoint2d = MPoint2d()): MPoint2d = localToRenderXY(p.x, p.y, out)
-	fun localToRenderXY(x: Double, y: Double, out: MPoint2d = MPoint2d()): MPoint2d = this.globalMatrix.transform(x, y, out)
-	fun localToRenderX(x: Double, y: Double): Double = this.globalMatrix.transformX(x, y)
-	fun localToRenderY(x: Double, y: Double): Double = this.globalMatrix.transformY(x, y)
+	fun localToRender(p: IPoint, out: Point = Point()): Point = localToRenderXY(p.x, p.y, out)
+	fun localToRenderXY(x: Float, y: Float, out: Point = Point()): Point = this.globalMatrix.transform(x, y, out)
+	fun localToRenderX(x: Float, y: Float): Float = this.globalMatrix.transformX(x, y)
+	fun localToRenderY(x: Float, y: Float): Float = this.globalMatrix.transformY(x, y)
 
-	open fun hitTest(x: Double, y: Double): View? = null
+	open fun hitTest(x: Float, y: Float): View? = null
 
-	//fun hitTest(x: Double, y: Double): View? {
+	//fun hitTest(x: Float, y: Float): View? {
 	//	if (!mouseEnabled) return null
 	//	return hitTestInternal(x, y)
 	//}
 
-	open fun hitTestInternal(x: Double, y: Double): View? {
+	open fun hitTestInternal(x: Float, y: Float): View? {
 		val bounds = getLocalBounds()
 		return if (checkGlobalBounds(x, y, bounds.left, bounds.top, bounds.right, bounds.bottom)) this else null
 	}
 
-	open fun hitTestBoundingInternal(x: Double, y: Double): View? {
+	open fun hitTestBoundingInternal(x: Float, y: Float): View? {
 		val bounds = getGlobalBounds()
 		return if (bounds.contains(x, y)) this else null
 	}
 
 	protected fun checkGlobalBounds(
-		x: Double,
-		y: Double,
-		sLeft: Double,
-		sTop: Double,
-		sRight: Double,
-		sBottom: Double
+		x: Float,
+		y: Float,
+		sLeft: Float,
+		sTop: Float,
+		sRight: Float,
+		sBottom: Float
 	): Boolean {
 		val lx = globalToLocalX(x, y)
 		val ly = globalToLocalY(x, y)
@@ -543,11 +548,11 @@ abstract class View : Renderable, Extra by Extra.Mixin(), EventDispatcher by Eve
 	}
 
 	open fun reset() {
-		_localMatrix.setToIdentity()
+		_localMatrix.identity()
 		pos.setTo(0.0, 0.0)
-		_scaleX = 1.0; _scaleY = 1.0
-		_skewX = 0.0; _skewY = 0.0
-		_rotation = 0.0
+		_scaleX = 1f; _scaleY = 1f
+		_skewX = 0f; _skewY = 0f
+		_rotation = 0f
 		validLocalMatrix = false
 		invalidate()
 	}
@@ -561,7 +566,7 @@ abstract class View : Renderable, Extra by Extra.Mixin(), EventDispatcher by Eve
 		index = -1
 	}
 
-	//fun getConcatMatrix(target: View, out: Matrix2d = Matrix2d()): Matrix2d {
+	//fun getConcatMatrix(target: View, out: Matrix = Matrix()): Matrix {
 	//	var current: View? = this
 	//	out.setToIdentity()
 	//
@@ -576,9 +581,9 @@ abstract class View : Renderable, Extra by Extra.Mixin(), EventDispatcher by Eve
 	//	return out
 	//}
 
-	fun getConcatMatrix(target: View, out: Matrix2d = Matrix2d()): Matrix2d {
+	fun getConcatMatrix(target: View, out: Matrix = Matrix()): Matrix {
 		var current: View? = this
-		out.setToIdentity()
+		out.identity()
 
 		while (current != null) {
 			//out.premultiply(current.localMatrix)
@@ -600,10 +605,10 @@ abstract class View : Renderable, Extra by Extra.Mixin(), EventDispatcher by Eve
 
 		getLocalBoundsInternal(out)
 
-		val p1 = Point2d(out.left, out.top)
-		val p2 = Point2d(out.right, out.top)
-		val p3 = Point2d(out.right, out.bottom)
-		val p4 = Point2d(out.left, out.bottom)
+		val p1 = Point(out.left, out.top)
+		val p2 = Point(out.right, out.top)
+		val p3 = Point(out.right, out.bottom)
+		val p4 = Point(out.left, out.bottom)
 
 		bb.add(concat.transformX(p1.x, p1.y), concat.transformY(p1.x, p1.y))
 		bb.add(concat.transformX(p2.x, p2.y), concat.transformY(p2.x, p2.y))
@@ -693,11 +698,11 @@ class ViewTransform(var view: View) {
 
 	var blendMode: BlendMode = BlendMode.INHERIT
 
-	val localMatrix: Matrix2d get() = _localMatrix
-	private val _localMatrix = Matrix2d()
+	val localMatrix: Matrix get() = _localMatrix
+	private val _localMatrix = Matrix()
 
-	val globalMatrix: Matrix2d get() = _globalMatrix.value
-	private val _globalMatrix = CachedMutable(Matrix2d()) {
+	val globalMatrix: Matrix get() = _globalMatrix.value
+	private val _globalMatrix = CachedMutable(Matrix()) {
 		if (parent != null) {
 			it.multiply(localMatrix, parent!!.globalMatrix)
 		} else {
@@ -705,8 +710,8 @@ class ViewTransform(var view: View) {
 		}
 	}
 
-	val renderMatrix: Matrix2d get() = _renderMatrix.value
-	private val _renderMatrix = CachedMutable(Matrix2d()) {
+	val renderMatrix: Matrix get() = _renderMatrix.value
+	private val _renderMatrix = CachedMutable(Matrix()) {
 		if (parent != null && view !is View.Reference) {
 			it.multiply(localMatrix, parent!!.renderMatrix)
 		} else {
@@ -727,8 +732,8 @@ class ViewTransform(var view: View) {
 }
 */
 
-inline fun View.hitTest(x: Number, y: Number): View? = hitTest(x.toDouble(), y.toDouble())
-fun View.hitTest(pos: Point2d): View? = hitTest(pos.x, pos.y)
+inline fun View.hitTest(x: Number, y: Number): View? = hitTest(x.toFloat(), y.toFloat())
+fun View.hitTest(pos: IPoint): View? = hitTest(pos.x, pos.y)
 
 
 open class DummyView : View() {
@@ -811,7 +816,7 @@ fun View?.descendantsWithPropString(prop: String, value: String? = null): List<P
 fun View?.descendantsWithPropInt(prop: String, value: Int? = null): List<Pair<View, Int>> =
 	this.descendantsWithProp(prop, if (value != null) "$value" else null).map { it to it.getPropInt(prop) }
 
-fun View?.descendantsWithPropDouble(prop: String, value: Double? = null): List<Pair<View, Int>> =
+fun View?.descendantsWithPropDouble(prop: String, value: Float? = null): List<Pair<View, Int>> =
 	this.descendantsWithProp(prop, if (value != null) "$value" else null).map { it to it.getPropInt(prop) }
 
 operator fun View?.get(name: String): View? = firstDescendantWith { it.name == name }
@@ -854,11 +859,11 @@ fun View?.descendantsWith(out: ArrayList<View> = arrayListOf(), check: (View) ->
 
 @Suppress("NOTHING_TO_INLINE")
 inline fun <T : View> T.xy(x: Number, y: Number): T =
-	this.apply { this.x = x.toDouble() }.apply { this.y = y.toDouble() }
+	this.apply { this.x = x.toFloat() }.apply { this.y = y.toFloat() }
 
 @Suppress("NOTHING_TO_INLINE")
 inline fun <T : View> T.position(x: Number, y: Number): T =
-	this.apply { this.x = x.toDouble() }.apply { this.y = y.toDouble() }
+	this.apply { this.x = x.toFloat() }.apply { this.y = y.toFloat() }
 
 @Suppress("NOTHING_TO_INLINE")
 inline fun <T : View> T.rotation(rot: Angle): T =
@@ -866,21 +871,21 @@ inline fun <T : View> T.rotation(rot: Angle): T =
 
 @Suppress("NOTHING_TO_INLINE")
 inline fun <T : View> T.rotation(rot: Number): T =
-	this.apply { this.rotationRadians = rot.toDouble() }
+	this.apply { this.rotationRadians = rot.toFloat() }
 
 @Suppress("NOTHING_TO_INLINE")
 inline fun <T : View> T.rotationDegrees(degs: Number): T =
-	this.apply { this.rotationDegrees = degs.toDouble() }
+	this.apply { this.rotationDegrees = degs.toFloat() }
 
 @Suppress("NOTHING_TO_INLINE")
 inline fun <T : View> T.skew(sx: Number, sy: Number): T =
-	this.apply { this.skewX = sx.toDouble() }.apply { this.skewY = sy.toDouble() }
+	this.apply { this.skewX = sx.toFloat() }.apply { this.skewY = sy.toFloat() }
 
 @Suppress("NOTHING_TO_INLINE")
 inline fun <T : View> T.scale(sx: Number, sy: Number = sx): T =
-	this.apply { this.scaleX = sx.toDouble() }.apply { this.scaleY = sy.toDouble() }
+	this.apply { this.scaleX = sx.toFloat() }.apply { this.scaleY = sy.toFloat() }
 
 @Suppress("NOTHING_TO_INLINE")
 inline fun <T : View> T.alpha(alpha: Number): T =
-	this.apply { this.alpha = alpha.toDouble() }
+	this.apply { this.alpha = alpha.toFloat() }
 

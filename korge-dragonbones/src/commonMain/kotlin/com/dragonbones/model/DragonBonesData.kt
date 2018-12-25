@@ -96,7 +96,7 @@ class DragonBonesData(pool: BaseObjectPool) : BaseObject(pool) {
 	/**
 	 * @internal
 	 */
-	val cachedFrames:  DoubleArrayList = DoubleArrayList()
+	val cachedFrames:  FloatArrayList = FloatArrayList()
 	/**
 	 * - All armature data names.
 	 * @version DragonBones 3.0
@@ -135,13 +135,13 @@ class DragonBonesData(pool: BaseObjectPool) : BaseObject(pool) {
 	 * @internal
 	 */
 	var frameFloatArray: Float32Buffer? = null
-	//var frameFloatArray: DoubleArrayList? = null
+	//var frameFloatArray: FloatArrayList? = null
 	/**
 	 * @internal
 	 */
 	var frameArray: Int16Buffer? = null
 	//var frameArray: IntArrayList? = null
-	//var frameArray: DoubleArrayList? = null
+	//var frameArray: FloatArrayList? = null
 	/**
 	 * @internal
 	 */
@@ -158,7 +158,7 @@ class DragonBonesData(pool: BaseObjectPool) : BaseObject(pool) {
 	 */
 	var userData: UserData? = null // Initial value.
 
-	override fun _onClear(): Unit {
+	override fun _onClear() {
 		for (a in this.armatures.values) a.returnToPool()
 		this.armatures.clear()
 

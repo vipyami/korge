@@ -7,7 +7,7 @@ import com.soywiz.korge.tween.*
 import com.soywiz.korge.view.*
 import com.soywiz.korim.bitmap.*
 import com.soywiz.korio.async.*
-import com.soywiz.korma.*
+
 import com.soywiz.korma.geom.*
 import kotlin.math.*
 
@@ -46,7 +46,7 @@ class SpriterView(
 	val animationFinished = Signal<Unit>()
 
 	init {
-		addUpdatable { updateInternal(it) }
+		addUpdatable { updateInternal(it.millisecondsInt) }
 	}
 
 	var animationWeight: Double; get () = player.weight.toDouble(); set(value) = run { player.weight = value.toFloat() }
@@ -94,8 +94,8 @@ class SpriterView(
 		player.update()
 	}
 
-	private val t1: Matrix2d = Matrix2d()
-	private val t2: Matrix2d = Matrix2d()
+	private val t1: Matrix = Matrix()
+	private val t2: Matrix = Matrix()
 
 	override fun renderInternal(ctx: RenderContext) {
 		if (!visible) return
@@ -112,7 +112,7 @@ class SpriterView(
 			t1.setTransform(
 				(obj.position.x - 0.0), (obj.position.y - 0.0),
 				obj.scale.x.toDouble(), -obj.scale.y.toDouble(),
-				-Angle.toRadians(obj._angle.toDouble()),
+				-Angle.toRadians(obj._angle),
 				0.0, 0.0
 			)
 			t2.copyFrom(globalMatrix)

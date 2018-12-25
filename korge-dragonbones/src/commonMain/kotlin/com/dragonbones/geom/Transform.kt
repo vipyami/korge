@@ -1,6 +1,6 @@
 package com.dragonbones.geom
 
-import com.soywiz.korma.*
+
 import kotlin.math.*
 
 /**
@@ -137,11 +137,10 @@ class Transform
 		/**
 		 * @private
 		 */
-		fun normalizeRadian(value: Double): Double {
+		fun normalizeRadian(value: Float): Float {
 			var value = (value + PI) % (PI * 2.0)
 			value += if (value > 0f) -PI else PI
-
-			return value
+			return value.toFloat()
 		}
 	}
 
@@ -267,14 +266,14 @@ class Transform
 		return this
 	}
 
-	fun toMatrix2d(matrix: Matrix2d): Transform {
+	fun toMatrix2d(matrix: Matrix): Transform {
 		if (this.rotation == 0f) {
-			matrix.a = 1.0
-			matrix.b = 0.0
+			matrix.a = 1f
+			matrix.b = 0f
 		}
 		else {
-			matrix.a = cos(this.rotation).toDouble()
-			matrix.b = sin(this.rotation).toDouble()
+			matrix.a = cos(this.rotation).toFloat()
+			matrix.b = sin(this.rotation).toFloat()
 		}
 
 		if (this.skew == 0f) {
@@ -282,8 +281,8 @@ class Transform
 			matrix.d = matrix.a
 		}
 		else {
-			matrix.c = (-sin(this.skew + this.rotation)).toDouble()
-			matrix.d = cos(this.skew + this.rotation).toDouble()
+			matrix.c = (-sin(this.skew + this.rotation)).toFloat()
+			matrix.d = cos(this.skew + this.rotation).toFloat()
 		}
 
 		if (this.scaleX != 1f) {
@@ -296,9 +295,56 @@ class Transform
 			matrix.d *= this.scaleY
 		}
 
-		matrix.tx = this.x.toDouble()
-		matrix.ty = this.y.toDouble()
+		matrix.tx = this.x.toFloat()
+		matrix.ty = this.y.toFloat()
 
 		return this
 	}
 }
+
+const val PI_D: Float = PIf * 2f
+const val PI_H: Float = PIf / 2f
+const val PI_Q: Float = PIf / 4f
+const val RAD_DEG: Float = 180f / PIf
+const val DEG_RAD: Float = PIf / 180f
+
+fun normalizeRadian(value: Float): Float {
+	var value = (value + Transform.PI) % (Transform.PI * 2.0)
+	value += if (value > 0f) -Transform.PI else Transform.PI
+	return value.toFloat()
+}
+
+/*
+typealias Transform = Transform
+
+fun normalizeRadian(value: Float): Float {
+	var vv = (value + PI.toFloat()) % (PI.toFloat() * 2f)
+	vv += if (vv > 0f) -PI.toFloat() else PI.toFloat()
+	return vv
+}
+
+fun Transform.fromMatrix(matrix: Matrix): Transform {
+	setMatrix(matrix)
+	return this
+}
+
+fun Transform.add(value: Transform): Transform = setTo(
+	x + value.x,
+	y + value.y,
+	scaleX * value.scaleX,
+	scaleY * value.scaleY,
+	rotation + value.rotation,
+	skewX + value.skewX,
+	skewY + value.skewY
+)
+
+fun Transform.toMatrix2d(matrix: Matrix): Transform {
+	this.toMatrix(matrix)
+	return this
+}
+
+internal var Transform.skew: Float
+	set(value) = run { skewX = value }
+	get() = skewX
+
+*/

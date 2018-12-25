@@ -27,10 +27,13 @@ package com.dragonbones.armature
 import com.dragonbones.core.*
 import com.dragonbones.event.*
 import com.dragonbones.geom.*
+import com.dragonbones.geom.ColorTransform
 import com.dragonbones.model.*
 import com.dragonbones.util.*
 import com.soywiz.kds.*
 import com.soywiz.kmem.*
+import com.soywiz.korim.color.*
+
 import kotlin.math.*
 
 /**
@@ -46,18 +49,17 @@ class DisplayFrame(pool: BaseObjectPool) :  BaseObject(pool) {
 	var _textureData: TextureData? = null
 	//var display: Armature? = null
 	var display: Any? = null
-	var deformVertices:  DoubleArray = DoubleArray(0)
-	//var deformVertices:  FloatArray = FloatArray(0)
+	var deformVertices:  FloatArray = FloatArray(0)
 
-	override fun _onClear(): Unit {
+	override fun _onClear() {
 		this.rawDisplayData = null
 		this.displayData = null
 		this._textureData = null
 		this.display = null
-		this.deformVertices = DoubleArray(0)
+		this.deformVertices = FloatArray(0)
 	}
 
-	fun updateDeformVertices(): Unit {
+	fun updateDeformVertices() {
 		if (this.rawDisplayData == null || this.deformVertices.size != 0) {
 			return
 		}
@@ -81,11 +83,11 @@ class DisplayFrame(pool: BaseObjectPool) :  BaseObject(pool) {
 			vertexCount = rawGeometryData.data!!.intArray!![rawGeometryData.offset + BinaryOffset.GeometryVertexCount] * 2
 		}
 
-		this.deformVertices = DoubleArray(vertexCount)
 		//this.deformVertices = FloatArray(vertexCount)
+		this.deformVertices = FloatArray(vertexCount)
 		//for (var i = 0, l = this.deformVertices.length; i < l; ++i) {
 		for (i in 0 until this.deformVertices.size) {
-			this.deformVertices[i] = 0.0
+			this.deformVertices[i] = 0f
 		}
 	}
 
@@ -229,11 +231,11 @@ abstract class Slot(pool: BaseObjectPool) :  TransformObject(pool) {
 	/**
 	 * @internal
 	 */
-	var _pivotX: Double = 0.0
+	var _pivotX: Float = 0f
 	/**
 	 * @internal
 	 */
-	var _pivotY: Double = 0.0
+	var _pivotY: Float = 0f
 	protected val _localMatrix: Matrix = Matrix()
 	/**
 	 * @internal
@@ -272,7 +274,7 @@ abstract class Slot(pool: BaseObjectPool) :  TransformObject(pool) {
 	/**
 	 * @internal
 	 */
-	//var _cachedFrameIndices:  DoubleArray? = null
+	//var _cachedFrameIndices:  FloatArray? = null
 	var _cachedFrameIndices:  IntArrayList? = null
 
 	override fun _onClear(): Unit {
@@ -327,8 +329,8 @@ abstract class Slot(pool: BaseObjectPool) :  TransformObject(pool) {
 		this._zOrder = 0
 		this._zIndex = 0
 		this._cachedFrameIndex = -1
-		this._pivotX = 0.0
-		this._pivotY = 0.0
+		this._pivotX = 0f
+		this._pivotY = 0f
 		this._localMatrix.identity()
 		this._colorTransform.identity()
 		this._displayFrames.clear()
@@ -431,11 +433,11 @@ abstract class Slot(pool: BaseObjectPool) :  TransformObject(pool) {
 			// Update pivot offset.
 			if (this._geometryData == null && _textureData != null) {
 				val imageDisplayData = (if (displayData != null && displayData.type == DisplayType.Image) displayData else rawDisplayData) as ImageDisplayData //
-				val scale = _textureData.parent!!.scale * this._armature!!._armatureData!!.scale
+				val scale: Float = _textureData.parent!!.scale * this._armature!!._armatureData!!.scale
 				val frame = _textureData.frame
 
-				this._pivotX = imageDisplayData.pivot.x.toDouble()
-				this._pivotY = imageDisplayData.pivot.y.toDouble()
+				this._pivotX = imageDisplayData.pivot.x.toFloat()
+				this._pivotY = imageDisplayData.pivot.y.toFloat()
 
 				val rect = frame ?: _textureData.region
 				var width = rect.width
@@ -474,8 +476,8 @@ abstract class Slot(pool: BaseObjectPool) :  TransformObject(pool) {
 				}
 			}
 			else {
-				this._pivotX = 0.0
-				this._pivotY = 0.0
+				this._pivotX = 0f
+				this._pivotY = 0f
 			}
 
 			// Update original transform.
@@ -856,7 +858,7 @@ abstract class Slot(pool: BaseObjectPool) :  TransformObject(pool) {
 
 		val displayFrame = this._displayFrames[index]
 		if (displayFrame.rawDisplayData != displayData) {
-			displayFrame.deformVertices = DoubleArray(0)
+			displayFrame.deformVertices = FloatArray(0)
 			displayFrame.rawDisplayData = displayData
 			if (displayFrame.rawDisplayData == null) {
 				val defaultSkin = this._armature?._armatureData?.defaultSkin
@@ -982,7 +984,7 @@ abstract class Slot(pool: BaseObjectPool) :  TransformObject(pool) {
 	 * @version DragonBones 5.0
 	 * @language zh_CN
 	 */
-	fun containsPoint(x: Double, y: Double): Boolean {
+	fun containsPoint(x: Float, y: Float): Boolean {
 		if (this._boundingBoxData == null) {
 			return false
 		}
@@ -993,7 +995,7 @@ abstract class Slot(pool: BaseObjectPool) :  TransformObject(pool) {
 		_helpMatrix.invert()
 		_helpMatrix.transformPoint(x, y, _helpPoint)
 
-		return this._boundingBoxData!!.containsPoint(_helpPoint.x.toDouble(), _helpPoint.y.toDouble())
+		return this._boundingBoxData!!.containsPoint(_helpPoint.x, _helpPoint.y)
 	}
 	/**
 	 * - Check whether a specific segment intersects a custom bounding box for the slot.
@@ -1026,7 +1028,7 @@ abstract class Slot(pool: BaseObjectPool) :  TransformObject(pool) {
 	 * @language zh_CN
 	 */
 	fun intersectsSegment(
-		xA: Double, yA: Double, xB: Double, yB: Double,
+		xA: Float, yA: Float, xB: Float, yB: Float,
 		intersectionPointA: Point? = null,
 		intersectionPointB: Point? = null,
 		normalRadians: Point? = null
@@ -1045,8 +1047,7 @@ abstract class Slot(pool: BaseObjectPool) :  TransformObject(pool) {
 		val xB = _helpPoint.x
 		val yB = _helpPoint.y
 
-		val intersectionCount = this._boundingBoxData!!.intersectsSegment(xA.toDouble(),
-			yA.toDouble(), xB.toDouble(), yB.toDouble(), intersectionPointA, intersectionPointB, normalRadians)
+		val intersectionCount = this._boundingBoxData!!.intersectsSegment(xA, yA, xB, yB, intersectionPointA, intersectionPointB, normalRadians)
 		if (intersectionCount > 0) {
 			if (intersectionCount == 1 || intersectionCount == 2) {
 				if (intersectionPointA != null) {

@@ -18,7 +18,7 @@ data class SWFExportConfig(
 	val mipmaps: Boolean = true,
 	val antialiasing: Boolean = true,
 	val rasterizerMethod: Context2d.ShapeRasterizerMethod = Context2d.ShapeRasterizerMethod.X4,
-	val exportScale: Double = 1.0,
+	val exportScale: Float = 1f,
 	//val exportScale: Double = 1.1,
 	val minShapeSide: Int = 64,
 	val maxShapeSide: Int = 512,

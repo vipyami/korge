@@ -24,7 +24,7 @@ class ViewList(
 		val n = container.children.size
 		val item = view0.clone()
 		container += item
-		item.setMatrixInterpolated(n.toDouble(), view0.localMatrix, view1.localMatrix)
+		item.setMatrixInterpolated(n.toFloat(), view0.localMatrix, view1.localMatrix)
 		onAddedView(ChangeEvent(item, n))
 	}
 

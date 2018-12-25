@@ -22,14 +22,16 @@
  */
 package com.dragonbones.geom
 
+import com.soywiz.korim.color.*
+
 /**
  * @private
  */
 class ColorTransform(
-	var alphaMultiplier: Double = 1.0,
-	var redMultiplier: Double = 1.0,
-	var greenMultiplier: Double = 1.0,
-	var blueMultiplier: Double = 1.0,
+	var alphaMultiplier: Float = 1f,
+	var redMultiplier: Float = 1f,
+	var greenMultiplier: Float = 1f,
+	var blueMultiplier: Float = 1f,
 	var alphaOffset: Int = 0,
 	var redOffset: Int = 0,
 	var greenOffset: Int = 0,
@@ -48,13 +50,29 @@ class ColorTransform(
 	}
 
 	fun identity() {
-		this.alphaMultiplier = 1.0
-		this.redMultiplier = 1.0
-		this.greenMultiplier = 1.0
-		this.blueMultiplier = 1.0
+		this.alphaMultiplier = 1f
+		this.redMultiplier = 1f
+		this.greenMultiplier = 1f
+		this.blueMultiplier = 1f
 		this.alphaOffset = 0
 		this.redOffset = 0
 		this.greenOffset = 0
 		this.blueOffset = 0
 	}
 }
+
+/*
+var ColorTransform.alphaMultiplier: Float get() = mA ; set(value) = run { mA = value }
+var ColorTransform.redMultiplier: Float get() = mR ; set(value) = run { mR = value }
+var ColorTransform.greenMultiplier: Float get() = mG ; set(value) = run { mG = value }
+var ColorTransform.blueMultiplier: Float get() = mB ; set(value) = run { mB = value }
+
+var ColorTransform.alphaOffset: Int get() = aA ; set(value) = run { aA = value }
+var ColorTransform.redOffset: Int get() = aR ; set(value) = run { aR = value }
+var ColorTransform.greenOffset: Int get() = aG ; set(value) = run { aG = value }
+var ColorTransform.blueOffset: Int get() = aB ; set(value) = run { aB = value }
+
+fun ColorTransform.identity() {
+	setToIdentity()
+}
+*/

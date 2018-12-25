@@ -112,7 +112,7 @@ class SceneContainer(val views: Views) : Container() {
 		if (time > 0.seconds) {
 			transitionView.tween(transitionView::ratio[0.0, 1.0], time = time)
 		} else {
-			transitionView.ratio = 1.0
+			transitionView.ratio = 1f
 		}
 
 		oldScene?.sceneDestroy()

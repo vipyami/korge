@@ -194,9 +194,9 @@ class BinaryDataParser(pool: BaseObjectPool = BaseObjectPool())  :  ObjectDataPa
 		animation.blendType = DataParser._getAnimationBlendType(ObjectDataParser._getString(rawData, DataParser.BLEND_TYPE, ""))
 		animation.frameCount = ObjectDataParser._getInt(rawData, DataParser.DURATION, 0)
 		animation.playTimes = ObjectDataParser._getInt(rawData, DataParser.PLAY_TIMES, 1)
-		animation.duration = animation.frameCount.toDouble() / this._armature!!.frameRate.toDouble() // float
-		animation.fadeInTime = ObjectDataParser._getNumber(rawData, DataParser.FADE_IN_TIME, 0.0)
-		animation.scale = ObjectDataParser._getNumber(rawData, DataParser.SCALE, 1.0)
+		animation.duration = animation.frameCount.toFloat() / this._armature!!.frameRate.toFloat() // float
+		animation.fadeInTime = ObjectDataParser._getNumber(rawData, DataParser.FADE_IN_TIME, 0f)
+		animation.scale = ObjectDataParser._getNumber(rawData, DataParser.SCALE, 1f)
 		animation.name = ObjectDataParser._getString(rawData, DataParser.NAME, DataParser.DEFAULT_NAME)
 		if (animation.name.isEmpty()) {
 			animation.name = DataParser.DEFAULT_NAME
@@ -275,8 +275,8 @@ class BinaryDataParser(pool: BaseObjectPool = BaseObjectPool())  :  ObjectDataPa
 					if (timelineType == TimelineType.AnimationProgress && animation.blendType != AnimationBlendType.None) {
 						timeline = pool.borrowObject<AnimationTimelineData>()
 						val animaitonTimeline = timeline
-						animaitonTimeline.x = ObjectDataParser._getNumber(rawTimeline, DataParser.X, 0.0)
-						animaitonTimeline.y = ObjectDataParser._getNumber(rawTimeline, DataParser.Y, 0.0)
+						animaitonTimeline.x = ObjectDataParser._getNumber(rawTimeline, DataParser.X, 0f)
+						animaitonTimeline.y = ObjectDataParser._getNumber(rawTimeline, DataParser.Y, 0f)
 					}
 
 					timeline = this._parseBinaryTimeline(timelineType, timelineOffset, timeline)
@@ -385,7 +385,7 @@ class BinaryDataParser(pool: BaseObjectPool = BaseObjectPool())  :  ObjectDataPa
 		this._data!!.colorArray = colorArray
 	}
 
-	override fun parseDragonBonesData(rawData: Any?, scale: Double): DragonBonesData? {
+	override fun parseDragonBonesData(rawData: Any?, scale: Float): DragonBonesData? {
 		//console.assert(rawData != null && rawData is MemBuffer, "Data error.")
 
 		val tag = NewUint8Buffer(rawData as MemBuffer, 0, 8)

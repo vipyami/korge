@@ -18,7 +18,7 @@ class KorgeDbViewsTestJvm {
 		)
 		val armatureDisplay = factory.buildArmatureDisplay("Dragon", "Dragon")!!.position(100, 100)
 		armatureDisplay.dbUpdate()
-		factory.clock.advanceTime(0.1)
+		factory.clock.advanceTime(0.1f)
 		armatureDisplay.dump()
 		println("--------------------")
 		armatureDisplay.dump()

@@ -85,14 +85,14 @@ class IKConstraint(pool: BaseObjectPool) :  Constraint(pool) {
 	 * - For timeline state.
 	 * @internal
 	 */
-	var _weight: Double = 1.0
+	var _weight: Float = 1f
 
 	override fun _onClear() {
 		super._onClear()
 
 		this._scaleEnabled = false
 		this._bendPositive = false
-		this._weight = 1.0
+		this._weight = 1f
 		//this._constraintData = null
 	}
 
@@ -102,11 +102,11 @@ class IKConstraint(pool: BaseObjectPool) :  Constraint(pool) {
 		val globalTransformMatrix = this._root.globalTransformMatrix
 
 		var radian = atan2(ikGlobal.y - global.y, ikGlobal.x - global.x)
-		if (global.scaleX < 0.0) {
+		if (global.scaleX < 0f) {
 			radian += PI.toFloat()
 		}
 
-		global.rotation += (Transform.normalizeRadian((radian - global.rotation).toDouble()) * this._weight).toFloat()
+		global.rotation += (normalizeRadian(radian - global.rotation) * this._weight)
 		global.toMatrix(globalTransformMatrix)
 	}
 
@@ -135,13 +135,13 @@ class IKConstraint(pool: BaseObjectPool) :  Constraint(pool) {
 		val lTT = dX * dX + dY * dY
 		val lT = sqrt(lTT)
 
-		var radianA: Double
+		var radianA: Float
 		if (lL + lP <= lT || lT + lL <= lP || lT + lP <= lL) {
-			radianA = atan2(ikGlobal.y - parentGlobal.y, ikGlobal.x - parentGlobal.x).toDouble()
+			radianA = atan2(ikGlobal.y - parentGlobal.y, ikGlobal.x - parentGlobal.x)
 			if (lL + lP <= lT) {
 			}
 			else if (lP < lL) {
-				radianA += PI
+				radianA += PIf
 			}
 		}
 		else {
@@ -156,7 +156,7 @@ class IKConstraint(pool: BaseObjectPool) :  Constraint(pool) {
 			val parentParent = parent.parent
 			if (parentParent != null) {
 				val parentParentMatrix = parentParent.globalTransformMatrix
-				isPPR = parentParentMatrix.a * parentParentMatrix.d - parentParentMatrix.b * parentParentMatrix.c < 0.0
+				isPPR = parentParentMatrix.a * parentParentMatrix.d - parentParentMatrix.b * parentParentMatrix.c < 0f
 			}
 
 			if (isPPR != this._bendPositive) {
@@ -168,23 +168,23 @@ class IKConstraint(pool: BaseObjectPool) :  Constraint(pool) {
 				global.y = (hY + rY).toFloat()
 			}
 
-			radianA = atan2(global.y - parentGlobal.y, global.x - parentGlobal.x).toDouble()
+			radianA = atan2(global.y - parentGlobal.y, global.x - parentGlobal.x)
 		}
 
-		val dR = Transform.normalizeRadian(radianA - rawRadianA)
-		parentGlobal.rotation = (rawParentRadian + dR * this._weight).toFloat()
+		val dR = normalizeRadian(radianA - rawRadianA)
+		parentGlobal.rotation = (rawParentRadian + dR * this._weight)
 		parentGlobal.toMatrix(parent.globalTransformMatrix)
 		//
 		val currentRadianA = rawRadianA + dR * this._weight
-		global.x = (parentGlobal.x + cos(currentRadianA) * lP).toFloat()
-		global.y = (parentGlobal.y + sin(currentRadianA) * lP).toFloat()
+		global.x = (parentGlobal.x + cos(currentRadianA) * lP)
+		global.y = (parentGlobal.y + sin(currentRadianA) * lP)
 		//
 		var radianB = atan2(ikGlobal.y - global.y, ikGlobal.x - global.x)
-		if (global.scaleX < 0.0) {
+		if (global.scaleX < 0f) {
 			radianB += PI.toFloat()
 		}
 
-		global.rotation = (parentGlobal.rotation + rawRadian - rawParentRadian + Transform.normalizeRadian(radianB - dR - rawRadian) * this._weight).toFloat()
+		global.rotation = (parentGlobal.rotation + rawRadian - rawParentRadian + normalizeRadian(radianB - dR - rawRadian) * this._weight)
 		global.toMatrix(globalTransformMatrix)
 	}
 
@@ -234,22 +234,22 @@ class PathConstraint(pool: BaseObjectPool) :  Constraint(pool) {
 
 	var dirty: Boolean = false
 	var pathOffset: Int = 0
-	var position: Double = 0.0
-	var spacing: Double = 0.0
-	var rotateOffset: Double = 0.0
-	var rotateMix: Double = 1.0
-	var translateMix: Double = 1.0
+	var position: Float = 0f
+	var spacing: Float = 0f
+	var rotateOffset: Float = 0f
+	var rotateMix: Float = 1f
+	var translateMix: Float = 1f
 
 	private var _pathSlot: Slot? = null
 	private var _bones: ArrayList<Bone> = ArrayList()
 
-	private var _spaces:  DoubleArray = DoubleArray(0)
-	private var _positions:  DoubleArray = DoubleArray(0)
-	private var _curves:  DoubleArray = DoubleArray(0)
-	private var _boneLengths:  DoubleArray = DoubleArray(0)
+	private var _spaces:  FloatArray = FloatArray(0)
+	private var _positions:  FloatArray = FloatArray(0)
+	private var _curves:  FloatArray = FloatArray(0)
+	private var _boneLengths:  FloatArray = FloatArray(0)
 
-	private var _pathGlobalVertices:  DoubleArray = DoubleArray(0)
-	private var _segments:  DoubleArray = DoubleArray(1) { 10.0 }
+	private var _pathGlobalVertices:  FloatArray = FloatArray(0)
+	private var _segments:  FloatArray = FloatArray(1) { 10f }
 
 	override fun toString(): String {
 		return "[class dragonBones.PathConstraint]"
@@ -261,21 +261,21 @@ class PathConstraint(pool: BaseObjectPool) :  Constraint(pool) {
 		this.dirty = false
 		this.pathOffset = 0
 
-		this.position = 0.0
-		this.spacing = 0.0
-		this.rotateOffset = 0.0
-		this.rotateMix = 1.0
-		this.translateMix = 1.0
+		this.position = 0f
+		this.spacing = 0f
+		this.rotateOffset = 0f
+		this.rotateMix = 1f
+		this.translateMix = 1f
 
 		this._pathSlot = null
 		this._bones.clear()
 
-		this._spaces = DoubleArray(0)
-		this._positions = DoubleArray(0)
-		this._curves = DoubleArray(0)
-		this._boneLengths = DoubleArray(0)
+		this._spaces = FloatArray(0)
+		this._positions = FloatArray(0)
+		this._curves = FloatArray(0)
+		this._boneLengths = FloatArray(0)
 
-		this._pathGlobalVertices = DoubleArray(0)
+		this._pathGlobalVertices = FloatArray(0)
 	}
 
 	protected fun _updatePathVertices(verticesData: GeometryData) {
@@ -290,7 +290,7 @@ class PathConstraint(pool: BaseObjectPool) :  Constraint(pool) {
 		val pathVertexCount = intArray[pathOffset + BinaryOffset.GeometryVertexCount]
 		val pathVertexOffset = intArray[pathOffset + BinaryOffset.GeometryFloatOffset]
 
-		this._pathGlobalVertices = DoubleArray(pathVertexCount * 2)
+		this._pathGlobalVertices = FloatArray(pathVertexCount * 2)
 
 		val weightData = verticesData.weight
 		//没有骨骼约束我,那节点只受自己的Bone控制
@@ -329,8 +329,8 @@ class PathConstraint(pool: BaseObjectPool) :  Constraint(pool) {
 		for (i in 0 until pathVertexCount) {
 			val vertexBoneCount = intArray[iB++] //
 
-			var xG = 0.0
-			var yG = 0.0
+			var xG = 0f
+			var yG = 0f
 			for (ii in 0 until vertexBoneCount) {
 				val boneIndex = intArray[iB++].toInt()
 				val bone = bones[boneIndex] ?: continue
@@ -349,7 +349,7 @@ class PathConstraint(pool: BaseObjectPool) :  Constraint(pool) {
 		}
 	}
 
-	protected fun _computeVertices(start: Int, count: Int, offset: Int, out:  DoubleArrayList) {
+	protected fun _computeVertices(start: Int, count: Int, offset: Int, out:  FloatArrayList) {
 		//TODO优化
 		var iW = start
 		for (i in offset until count step 2) {
@@ -364,18 +364,18 @@ class PathConstraint(pool: BaseObjectPool) :  Constraint(pool) {
 		val intArray = armature.armatureData.parent!!.intArray!!
 		val vertexCount = intArray[pathDisplayDta.geometry.offset + BinaryOffset.GeometryVertexCount].toInt()
 
-		this._positions = DoubleArray(spaceCount * 3 + 2)
+		this._positions = FloatArray(spaceCount * 3 + 2)
 		val positions = this._positions
 		val spaces = this._spaces
 		val isClosed = pathDisplayDta.closed
-		val curveVertices =  DoubleArrayList()
+		val curveVertices =  FloatArrayList()
 		var verticesLength = vertexCount * 2
 		var curveCount = verticesLength / 6
 		var preCurve = -1
-		var position: Double = this.position
+		var position: Float = this.position
 
 
-		var pathLength: Double
+		var pathLength: Float
 		//不需要匀速运动，效率高些
 		if (!pathDisplayDta.constantSpeed) {
 			val lenghts = pathDisplayDta.curveLengths
@@ -416,7 +416,7 @@ class PathConstraint(pool: BaseObjectPool) :  Constraint(pool) {
 					continue
 				}
 
-				var percent: Double
+				var percent: Float
 
 				//for (; ; curve++) {
 				//	val len = lenghts[curve]
@@ -485,24 +485,24 @@ class PathConstraint(pool: BaseObjectPool) :  Constraint(pool) {
 			this._computeVertices(2, verticesLength, 0, curveVertices)
 		}
 		//
-		val curves = DoubleArrayList(curveCount)
-		pathLength = 0.0
+		val curves = FloatArrayList(curveCount)
+		pathLength = 0f
 		var x1 = curveVertices[0]
 		var y1 = curveVertices[1]
-		var cx1 = 0.0
-		var cy1 = 0.0
-		var cx2 = 0.0
-		var cy2 = 0.0
-		var x2 = 0.0
-		var y2 = 0.0
-		var tmpx: Double
-		var tmpy: Double
-		var dddfx: Double
-		var dddfy: Double
-		var ddfx: Double
-		var ddfy: Double
-		var dfx: Double
-		var dfy: Double
+		var cx1 = 0f
+		var cy1 = 0f
+		var cx2 = 0f
+		var cy2 = 0f
+		var x2 = 0f
+		var y2 = 0f
+		var tmpx: Float
+		var tmpy: Float
+		var dddfx: Float
+		var dddfy: Float
+		var ddfx: Float
+		var ddfy: Float
+		var dfx: Float
+		var dfy: Float
 
 		//for (var i = 0, w = 2; i < curveCount; i++ , w += 6) {
 		for (i in 0 until curveCount) {
@@ -513,14 +513,14 @@ class PathConstraint(pool: BaseObjectPool) :  Constraint(pool) {
 			cy2 = curveVertices[w + 3]
 			x2 = curveVertices[w + 4]
 			y2 = curveVertices[w + 5]
-			tmpx = (x1 - cx1 * 2 + cx2) * 0.1875
-			tmpy = (y1 - cy1 * 2 + cy2) * 0.1875
-			dddfx = ((cx1 - cx2) * 3 - x1 + x2) * 0.09375
-			dddfy = ((cy1 - cy2) * 3 - y1 + y2) * 0.09375
+			tmpx = (x1 - cx1 * 2 + cx2) * 0.1875f
+			tmpy = (y1 - cy1 * 2 + cy2) * 0.1875f
+			dddfx = ((cx1 - cx2) * 3 - x1 + x2) * 0.09375f
+			dddfy = ((cy1 - cy2) * 3 - y1 + y2) * 0.09375f
 			ddfx = tmpx * 2 + dddfx
 			ddfy = tmpy * 2 + dddfy
-			dfx = (cx1 - x1) * 0.75 + tmpx + dddfx * 0.16666667
-			dfy = (cy1 - y1) * 0.75 + tmpy + dddfy * 0.16666667
+			dfx = (cx1 - x1) * 0.75f + tmpx + dddfx * 0.16666667f
+			dfy = (cy1 - y1) * 0.75f + tmpy + dddfy * 0.16666667f
 			pathLength += sqrt(dfx * dfx + dfy * dfy)
 			dfx += ddfx
 			dfy += ddfy
@@ -548,7 +548,7 @@ class PathConstraint(pool: BaseObjectPool) :  Constraint(pool) {
 		}
 
 		val segments = this._segments
-		var curveLength = 0.0
+		var curveLength = 0f
 		//for (var i = 0, o = 0, curve = 0, segment = 0; i < spaceCount; i++ , o += 3) {
 		var curve = 0
 		var segment = 0
@@ -607,14 +607,14 @@ class PathConstraint(pool: BaseObjectPool) :  Constraint(pool) {
 				cy2 = curveVertices[ii + 5]
 				x2 = curveVertices[ii + 6]
 				y2 = curveVertices[ii + 7]
-				tmpx = (x1 - cx1 * 2 + cx2) * 0.03
-				tmpy = (y1 - cy1 * 2 + cy2) * 0.03
-				dddfx = ((cx1 - cx2) * 3 - x1 + x2) * 0.006
-				dddfy = ((cy1 - cy2) * 3 - y1 + y2) * 0.006
+				tmpx = (x1 - cx1 * 2 + cx2) * 0.03f
+				tmpy = (y1 - cy1 * 2 + cy2) * 0.03f
+				dddfx = ((cx1 - cx2) * 3 - x1 + x2) * 0.006f
+				dddfy = ((cy1 - cy2) * 3 - y1 + y2) * 0.006f
 				ddfx = tmpx * 2 + dddfx
 				ddfy = tmpy * 2 + dddfy
-				dfx = (cx1 - x1) * 0.3 + tmpx + dddfx * 0.16666667
-				dfy = (cy1 - y1) * 0.3 + tmpy + dddfy * 0.16666667
+				dfx = (cx1 - x1) * 0.3f + tmpx + dddfx * 0.16666667f
+				dfy = (cy1 - y1) * 0.3f + tmpy + dddfy * 0.16666667f
 				curveLength = sqrt(dfx * dfx + dfy * dfy)
 				segments[0] = curveLength
 				//for (ii = 1; ii < 8; ii++) {
@@ -666,23 +666,23 @@ class PathConstraint(pool: BaseObjectPool) :  Constraint(pool) {
 				break
 			}
 
-			this.addCurvePosition(p * 0.1, x1, y1, cx1, cy1, cx2, cy2, x2, y2, positions, o, tangents)
+			this.addCurvePosition(p * 0.1f, x1, y1, cx1, cy1, cx2, cy2, x2, y2, positions, o, tangents)
 		}
 	}
 
 	//Calculates a point on the curve, for a given t value between 0 and 1.
-	private fun addCurvePosition(t: Double, x1: Double, y1: Double, cx1: Double, cy1: Double, cx2: Double, cy2: Double, x2: Double, y2: Double, out:  DoubleArray, offset: Int, tangents: Boolean) {
-		if (t == 0.0) {
+	private fun addCurvePosition(t: Float, x1: Float, y1: Float, cx1: Float, cy1: Float, cx2: Float, cy2: Float, x2: Float, y2: Float, out:  FloatArray, offset: Int, tangents: Boolean) {
+		if (t == 0f) {
 			out[offset] = x1
 			out[offset + 1] = y1
-			out[offset + 2] = 0.0
+			out[offset + 2] = 0f
 			return
 		}
 
-		if (t == 1.0) {
+		if (t == 1f) {
 			out[offset] = x2
 			out[offset + 1] = y2
-			out[offset + 2] = 0.0
+			out[offset + 2] = 0f
 			return
 		}
 
@@ -704,7 +704,7 @@ class PathConstraint(pool: BaseObjectPool) :  Constraint(pool) {
 			out[offset + 2] = atan2(y - (a * y1 + b * cy1 + c * cy2), x - (a * x1 + b * cx1 + c * cx2))
 		}
 		else {
-			out[offset + 2] = 0.0
+			out[offset + 2] = 0f
 		}
 	}
 
@@ -736,7 +736,7 @@ class PathConstraint(pool: BaseObjectPool) :  Constraint(pool) {
 		}
 
 		if (data.rotateMode == RotateMode.ChainScale) {
-			this._boneLengths = DoubleArray(this._bones.length)
+			this._boneLengths = FloatArray(this._bones.length)
 		}
 
 		this._root._hasConstraint = true
@@ -786,13 +786,13 @@ class PathConstraint(pool: BaseObjectPool) :  Constraint(pool) {
 		val spacesCount = if (isTangentMode) boneCount else boneCount + 1
 
 		val spacing = this.spacing
-		this._spaces = DoubleArray(spacesCount)
+		this._spaces = FloatArray(spacesCount)
 		val spaces = this._spaces
 
 		//计曲线间隔和长度
 		if (isChainScaleMode || isLengthMode) {
 			//Bone改变和spacing改变触发
-			spaces[0] = 0.0
+			spaces[0] = 0f
 			//for (var i = 0, l = spacesCount - 1; i < l; i++) {
 			for (i in 0 until spacesCount - 1) {
 				val bone = bones[i]
@@ -804,7 +804,7 @@ class PathConstraint(pool: BaseObjectPool) :  Constraint(pool) {
 
 				val len = sqrt(x * x + y * y)
 				if (isChainScaleMode) {
-					this._boneLengths[i] = len.toDouble()
+					this._boneLengths[i] = len.toFloat()
 				}
 				spaces[i + 1] = (boneLength + spacing) * len / boneLength
 			}
@@ -824,7 +824,7 @@ class PathConstraint(pool: BaseObjectPool) :  Constraint(pool) {
 		var boneX = positions[0]
 		var boneY = positions[1]
 		val tip: Boolean
-		if (rotateOffset == 0.0) {
+		if (rotateOffset == 0f) {
 			tip = rotateMode == RotateMode.Chain
 		}
 		else {
@@ -832,7 +832,7 @@ class PathConstraint(pool: BaseObjectPool) :  Constraint(pool) {
 			val bone = pathSlot._parent
 			if (bone != null) {
 				val matrix = bone.globalTransformMatrix
-				rotateOffset *= if (matrix.a * matrix.d - matrix.b * matrix.c > 0) Transform.DEG_RAD else -Transform.DEG_RAD
+				rotateOffset *= if (matrix.a * matrix.d - matrix.b * matrix.c > 0) DEG_RAD else -DEG_RAD
 			}
 		}
 
@@ -867,9 +867,9 @@ class PathConstraint(pool: BaseObjectPool) :  Constraint(pool) {
 				val b = matrix.b
 				val c = matrix.c
 				val d = matrix.d
-				var cos: Double
-				var sin: Double
-				var r: Double = if (isTangentMode) {
+				var cos: Float
+				var sin: Float
+				var r: Float = if (isTangentMode) {
 					positions[p - 1]
 				} else {
 					atan2(dy, dx)
@@ -889,11 +889,11 @@ class PathConstraint(pool: BaseObjectPool) :  Constraint(pool) {
 					r += rotateOffset
 				}
 
-				if (r > Transform.PI) {
-					r -= Transform.PI_D
+				if (r > PIf) {
+					r -= PI_D
 				}
-				else if (r < - Transform.PI) {
-					r += Transform.PI_D
+				else if (r < - PIf) {
+					r += PI_D
 				}
 
 				r *= rotateMix

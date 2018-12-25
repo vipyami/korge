@@ -3,10 +3,11 @@ package com.soywiz.korge.view
 import com.soywiz.korge.render.*
 import com.soywiz.korim.bitmap.*
 import com.soywiz.korma.geom.*
+import com.soywiz.korma.geom.vector.*
 
 open class RectBase(
-	anchorX: Double = 0.0,
-	anchorY: Double = anchorX,
+	anchorX: Float = 0f,
+	anchorY: Float = anchorX,
 	var hitShape: VectorPath? = null,
 	var smoothing: Boolean = true
 ) : Container() {
@@ -14,8 +15,8 @@ open class RectBase(
 	//abstract val height: Double
 
 	protected var baseBitmap: BmpSlice = Bitmaps.white; set(v) = run { field = v }.also { dirtyVertices = true }
-	var anchorX: Double = anchorX; set (v) = run { field = v }.also { dirtyVertices = true }
-	var anchorY: Double = anchorY; set(v) = run { field = v }.also { dirtyVertices = true }
+	var anchorX: Float = anchorX; set (v) = run { field = v }.also { dirtyVertices = true }
+	var anchorY: Float = anchorY; set(v) = run { field = v }.also { dirtyVertices = true }
 
 	protected open val bwidth get() = width
 	protected open val bheight get() = height
@@ -47,7 +48,7 @@ open class RectBase(
 		out.setTo(sLeft, sTop, bwidth, bheight)
 	}
 
-	override fun hitTest(x: Double, y: Double): View? {
+	override fun hitTest(x: Float, y: Float): View? {
 		val lres = if (checkGlobalBounds(x, y, sLeft, sTop, sRight, sBottom) &&
 			(hitShape?.containsPoint(globalToLocalX(x, y), globalToLocalY(x, y)) != false)
 		) this else null
@@ -62,11 +63,11 @@ open class RectBase(
 
 	override fun toString(): String {
 		var out = super.toString()
-		if (anchorX != 0.0 || anchorY != 0.0) out += ":anchor=(${anchorX.str}, ${anchorY.str})"
+		if (anchorX != 0f || anchorY != 0f) out += ":anchor=(${anchorX.str}, ${anchorY.str})"
 		return out
 	}
 }
 
 @Suppress("NOTHING_TO_INLINE")
 inline fun <T : RectBase> T.anchor(ax: Number, ay: Number): T =
-	this.apply { this.anchorX = ax.toDouble() }.apply { this.anchorY = ay.toDouble() }
+	this.apply { this.anchorX = ax.toFloat() }.apply { this.anchorY = ay.toFloat() }

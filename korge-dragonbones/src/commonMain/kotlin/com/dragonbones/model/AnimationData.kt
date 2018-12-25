@@ -93,11 +93,11 @@ class AnimationData(pool: BaseObjectPool) :  BaseObject(pool) {
 	 * @version DragonBones 3.0
 	 * @language zh_CN
 	 */
-	var duration: Double = 0.0
+	var duration: Float = 0f
 	/**
 	 * @private
 	 */
-	var scale: Double = 1.0
+	var scale: Float = 1f
 	/**
 	 * - The fade in time of the animation. (In seconds)
 	 * @version DragonBones 3.0
@@ -108,11 +108,11 @@ class AnimationData(pool: BaseObjectPool) :  BaseObject(pool) {
 	 * @version DragonBones 3.0
 	 * @language zh_CN
 	 */
-	var fadeInTime: Double = 0.0
+	var fadeInTime: Float = 0f
 	/**
 	 * @private
 	 */
-	var cacheFrameRate: Double = 0.0
+	var cacheFrameRate: Float = 0f
 	/**
 	 * - The animation name.
 	 * @version DragonBones 3.0
@@ -165,7 +165,7 @@ class AnimationData(pool: BaseObjectPool) :  BaseObject(pool) {
 	 */
 	var parent: ArmatureData? = null
 
-	override fun _onClear(): Unit {
+	override fun _onClear() {
 		for (tl in this.boneTimelines.values) {
 			for (timeline in tl) {
 				timeline.returnToPool()
@@ -206,10 +206,10 @@ class AnimationData(pool: BaseObjectPool) :  BaseObject(pool) {
 		this.blendType = AnimationBlendType.None
 		this.frameCount = 0
 		this.playTimes = 0
-		this.duration = 0.0
-		this.scale = 1.0
-		this.fadeInTime = 0.0
-		this.cacheFrameRate = 0.0
+		this.duration = 0f
+		this.scale = 1f
+		this.fadeInTime = 0f
+		this.cacheFrameRate = 0f
 		this.name = ""
 		this.cachedFrames.length = 0
 		// this.boneTimelines.clear();
@@ -227,11 +227,11 @@ class AnimationData(pool: BaseObjectPool) :  BaseObject(pool) {
 	 * @internal
 	 */
 	fun cacheFrames(frameRate: Int) {
-		if (this.cacheFrameRate > 0.0) { // TODO clear cache.
+		if (this.cacheFrameRate > 0f) { // TODO clear cache.
 			return
 		}
 
-		this.cacheFrameRate = max(ceil(frameRate * this.scale), 1.0)
+		this.cacheFrameRate = max(ceil(frameRate * this.scale), 1f)
 		val cacheFrameCount = ceil(this.cacheFrameRate * this.duration).toInt() + 1 // Cache one more frame.
 
 		this.cachedFrames.length = cacheFrameCount
@@ -249,7 +249,7 @@ class AnimationData(pool: BaseObjectPool) :  BaseObject(pool) {
 		}
 
 		for (slot in this.parent!!.sortedSlots) {
-			//val indices =  DoubleArray(cacheFrameCount)
+			//val indices =  FloatArray(cacheFrameCount)
 			val indices =  IntArrayList(cacheFrameCount)
 			for (i in 0 until indices.length) {
 				indices[i] = -1
@@ -355,13 +355,13 @@ class AnimationTimelineData(pool: BaseObjectPool) :  TimelineData(pool) {
 		return "[class dragonBones.AnimationTimelineData]"
 	}
 
-	var x: Double = 0.0
-	var y: Double = 0.0
+	var x: Float = 0f
+	var y: Float = 0f
 
 	override fun _onClear(): Unit {
 		super._onClear()
 
-		this.x = 0.0
-		this.y = 0.0
+		this.x = 0f
+		this.y = 0f
 	}
 }

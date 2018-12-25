@@ -56,14 +56,14 @@ class IKConstraintData(pool: BaseObjectPool) : ConstraintData(pool) {
 
 	var scaleEnabled: Boolean = false
 	var bendPositive: Boolean = false
-	var weight: Double = 1.0
+	var weight: Float = 1f
 
 	override fun _onClear(): Unit {
 		super._onClear()
 
 		this.scaleEnabled = false
 		this.bendPositive = false
-		this.weight = 1.0
+		this.weight = 1f
 	}
 }
 
@@ -83,11 +83,11 @@ class PathConstraintData(pool: BaseObjectPool) : ConstraintData(pool) {
 	var spacingMode: SpacingMode = SpacingMode.Fixed
 	var rotateMode: RotateMode = RotateMode.Chain
 
-	var position: Double = 0.0
-	var spacing: Double = 0.0
-	var rotateOffset: Double = 0.0
-	var rotateMix: Double = 0.0
-	var translateMix: Double = 0.0
+	var position: Float = 0f
+	var spacing: Float = 0f
+	var rotateOffset: Float = 0f
+	var rotateMix: Float = 0f
+	var translateMix: Float = 0f
 
 	override fun _onClear() {
 		super._onClear()
@@ -100,11 +100,11 @@ class PathConstraintData(pool: BaseObjectPool) : ConstraintData(pool) {
 		this.spacingMode = SpacingMode.Fixed
 		this.rotateMode = RotateMode.Chain
 
-		this.position = 0.0
-		this.spacing = 0.0
-		this.rotateOffset = 0.0
-		this.rotateMix = 0.0
-		this.translateMix = 0.0
+		this.position = 0f
+		this.spacing = 0f
+		this.rotateOffset = 0f
+		this.rotateMix = 0f
+		this.translateMix = 0f
 	}
 
 	fun AddBone(value: BoneData): Unit {

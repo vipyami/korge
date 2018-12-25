@@ -26,6 +26,7 @@ import com.dragonbones.core.*
 import com.dragonbones.geom.*
 import com.dragonbones.model.*
 import com.soywiz.kds.*
+
 import kotlin.math.*
 
 /**
@@ -126,7 +127,7 @@ open class Bone(pool: BaseObjectPool) :  TransformObject(pool) {
 		val flipX = this._armature!!.flipX
 		val flipY = this._armature!!.flipY == DragonBones.yDown
 		var inherit = parent != null
-		var rotation = 0.0
+		var rotation = 0f
 
 		if (this.offsetMode == OffsetMode.Additive) {
 			if (origin != null) {
@@ -209,19 +210,19 @@ open class Bone(pool: BaseObjectPool) :  TransformObject(pool) {
 						parent.updateGlobalTransform()
 
 						if (flipX && flipY) {
-							rotation = global.rotation - (parent.global.rotation + PI)
+							rotation = global.rotation - (parent.global.rotation + PIf)
 						}
 						else if (flipX) {
-							rotation = global.rotation + parent.global.rotation + PI
+							rotation = global.rotation + parent.global.rotation + PIf
 						}
 						else if (flipY) {
-							rotation = (global.rotation + parent.global.rotation).toDouble()
+							rotation = global.rotation + parent.global.rotation
 						}
 						else {
-							rotation = (global.rotation - parent.global.rotation).toDouble()
+							rotation = global.rotation - parent.global.rotation
 						}
 
-						global.rotation = rotation.toFloat()
+						global.rotation = rotation
 					}
 
 					global.toMatrix(globalTransformMatrix)
@@ -264,15 +265,15 @@ open class Bone(pool: BaseObjectPool) :  TransformObject(pool) {
 				if (boneData.inheritRotation) {
 					parent.updateGlobalTransform()
 
-					if (parent.global.scaleX < 0.0) {
-						rotation = global.rotation + parent.global.rotation + PI
+					if (parent.global.scaleX < 0f) {
+						rotation = global.rotation + parent.global.rotation + PIf
 					}
 					else {
-						rotation = (global.rotation + parent.global.rotation).toDouble()
+						rotation = global.rotation + parent.global.rotation
 					}
 
-					if (parentMatrix.a * parentMatrix.d - parentMatrix.b * parentMatrix.c < 0.0) {
-						rotation -= global.rotation * 2.0
+					if (parentMatrix.a * parentMatrix.d - parentMatrix.b * parentMatrix.c < 0f) {
+						rotation -= global.rotation * 2f
 
 						if (flipX != flipY || boneData.inheritReflection) {
 							global.skew += PI.toFloat()
@@ -283,24 +284,24 @@ open class Bone(pool: BaseObjectPool) :  TransformObject(pool) {
 						}
 					}
 
-					global.rotation = rotation.toFloat()
+					global.rotation = rotation
 				}
 				else if (flipX || flipY) {
 					if (flipX && flipY) {
-						rotation = global.rotation + PI
+						rotation = global.rotation + PIf
 					}
 					else {
 						if (flipX) {
-							rotation = PI - global.rotation
+							rotation = PIf - global.rotation
 						}
 						else {
-							rotation = (-global.rotation).toDouble()
+							rotation = -global.rotation
 						}
 
 						global.skew += PI.toFloat()
 					}
 
-					global.rotation = rotation.toFloat()
+					global.rotation = rotation
 				}
 
 				global.toMatrix(globalTransformMatrix)
@@ -317,20 +318,20 @@ open class Bone(pool: BaseObjectPool) :  TransformObject(pool) {
 				}
 
 				if (flipX && flipY) {
-					rotation = global.rotation + PI
+					rotation = global.rotation + PIf
 				}
 				else {
 					if (flipX) {
-						rotation = PI - global.rotation
+						rotation = PIf - global.rotation
 					}
 					else {
-						rotation = (-global.rotation).toDouble()
+						rotation = -global.rotation
 					}
 
 					global.skew += PI.toFloat()
 				}
 
-				global.rotation = rotation.toFloat()
+				global.rotation = rotation
 			}
 
 			global.toMatrix(globalTransformMatrix)

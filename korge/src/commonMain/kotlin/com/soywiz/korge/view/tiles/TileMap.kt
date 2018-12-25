@@ -5,21 +5,20 @@ import com.soywiz.korge.render.*
 import com.soywiz.korge.util.*
 import com.soywiz.korge.view.*
 import com.soywiz.korim.bitmap.*
-import com.soywiz.korma.*
 import com.soywiz.korma.geom.*
 
 inline fun Container.tileMap(map: IntArray2, tileset: TileSet, callback: @ViewsDslMarker TileMap.() -> Unit = {}) =
 	TileMap(map, tileset).addTo(this).apply(callback)
 
 open class TileMap(val map: IntArray2, val tileset: TileSet) : View() {
-	val tileWidth = tileset.width.toDouble()
-	val tileHeight = tileset.height.toDouble()
+	val tileWidth = tileset.width.toFloat()
+	val tileHeight = tileset.height.toFloat()
 	var smoothing = true
 
-	private val t0 = MPoint2d(0, 0)
-	private val tt0 = MPoint2d(0, 0)
-	private val tt1 = MPoint2d(0, 0)
-	private val tempPointPool = MVector2Area(16)
+	private val t0 = Point(0, 0)
+	private val tt0 = Point(0, 0)
+	private val tt1 = Point(0, 0)
+	private val tempPointPool = PointArea(16)
 
 	private fun computeVertexIfRequired(ctx: RenderContext) {
 		if (!dirtyVertices) return
@@ -28,9 +27,9 @@ open class TileMap(val map: IntArray2, val tileset: TileSet) : View() {
 
 		val renderTilesCounter = ctx.stats.counter("renderedTiles")
 
-		val pos = m.transform(0.0, 0.0)
-		val dU = m.transform(tileWidth, 0.0) - pos
-		val dV = m.transform(0.0, tileHeight) - pos
+		val pos = m.transform(0f, 0f)
+		val dU = m.transform(tileWidth, 0f) - pos
+		val dV = m.transform(0f, tileHeight) - pos
 
 		val colMulInt = renderColorMulInt
 		val colAdd = renderColorAdd
@@ -117,7 +116,7 @@ open class TileMap(val map: IntArray2, val tileset: TileSet) : View() {
 		out.setTo(0, 0, tileWidth * map.width, tileHeight * map.height)
 	}
 
-	override fun hitTest(x: Double, y: Double): View? {
-		return if (checkGlobalBounds(x, y, 0.0, 0.0, tileWidth * map.width, tileHeight * map.height)) this else null
+	override fun hitTest(x: Float, y: Float): View? {
+		return if (checkGlobalBounds(x, y, 0f, 0f, tileWidth * map.width, tileHeight * map.height)) this else null
 	}
 }

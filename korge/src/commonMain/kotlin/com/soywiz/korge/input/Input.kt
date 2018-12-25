@@ -1,6 +1,7 @@
 package com.soywiz.korge.input
 
 import com.soywiz.kds.*
+import com.soywiz.klock.*
 import com.soywiz.kmem.*
 import com.soywiz.korinject.*
 import com.soywiz.korma.geom.*
@@ -27,7 +28,7 @@ class Input : Extra by Extra.Mixin() {
 		for (touch in touches) if (touch.active) activeTouches.add(touch)
 	}
 
-	val mouse = MPoint2d(-1000.0, -1000.0)
+	val mouse = Point(-1000.0, -1000.0)
 	var mouseButtons = 0
 	var clicked = false
 	val keysRaw = BooleanArray(KEYCODES)
@@ -50,12 +51,14 @@ class Input : Extra by Extra.Mixin() {
 		if (pKeyCode in keysRaw.indices) keysRaw[pKeyCode] = b
 	}
 
-	fun startFrame(dtMs: Int) {
+	fun startFrame(time: TimeSpan) {
 		this.extra?.clear()
 	}
 
-	fun endFrame(dtMs: Int) {
+	fun endFrame(time: TimeSpan) {
 		this.clicked = false
+
+		val dtMs = time.millisecondsInt
 
 		for (n in 0 until KEYCODES) {
 			val prev = keysRawPrev[n]

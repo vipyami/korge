@@ -31,16 +31,16 @@ import kotlin.reflect.*
 private val logger = Logger("Views")
 
 interface BoundsProvider {
-	val virtualLeft: Double
-	val virtualTop: Double
-	val virtualRight: Double
-	val virtualBottom: Double
+	val virtualLeft: Float
+	val virtualTop: Float
+	val virtualRight: Float
+	val virtualBottom: Float
 
 	object Dummy : BoundsProvider {
-		override val virtualLeft: Double = 0.0
-		override val virtualTop: Double = 0.0
-		override val virtualRight: Double = 0.0
-		override val virtualBottom: Double = 0.0
+		override val virtualLeft: Float = 0f
+		override val virtualTop: Float = 0f
+		override val virtualRight: Float = 0f
+		override val virtualBottom: Float = 0f
 	}
 }
 
@@ -66,7 +66,7 @@ class Views(
 	var clearEachFrame = true
 	override val views = this
 	val propsTriggers = hashMapOf<String, (View, String, String) -> Unit>()
-	var clampElapsedTimeTo = 100
+	var clampElapsedTimeTo = 100.milliseconds
 
 	val nativeWidth get() = ag.mainRenderBuffer.width
 	val nativeHeight get() = ag.mainRenderBuffer.height
@@ -88,8 +88,8 @@ class Views(
 	val actualVirtualRight get() = actualVirtualWidth
 	val actualVirtualBottom get() = actualVirtualHeight
 
-	val nativeMouseX: Double get() = input.mouse.x
-	val nativeMouseY: Double get() = input.mouse.y
+	val nativeMouseX: Float get() = input.mouse.x
+	val nativeMouseY: Float get() = input.mouse.y
 
 	var scaleMode: ScaleMode = ScaleMode.SHOW_ALL
 	var scaleAnchor = Anchor.MIDDLE_CENTER
@@ -193,27 +193,26 @@ class Views(
 		//println("Render")
 		val currentTime = timeProvider.now()
 		//println("currentTime: $currentTime")
-		val delta = (currentTime - lastTime).millisecondsInt
-		val adelta = min(delta, views.clampElapsedTimeTo)
+		val delta = (currentTime - lastTime)
+		val adelta = min(delta.milliseconds, views.clampElapsedTimeTo.milliseconds).milliseconds
 		//println("delta: $delta")
 		//println("Render($lastTime -> $currentTime): $delta")
 		lastTime = currentTime
 		if (fixedSizeStep != TimeSpan.NULL) {
-			update(fixedSizeStep.millisecondsInt)
+			update(fixedSizeStep)
 		} else {
 			update(adelta)
 		}
 		render(clearColor, clear)
 	}
 
-	override fun update(dtMs: Int) {
+	override fun update(time: TimeSpan) {
 		//println(this)
 		//println("Update: $dtMs")
-		input.startFrame(dtMs)
-		val dtMsD = dtMs.toDouble()
-		stage.updateSingleView(dtMsD, tempComponents)
-		stage.updateSingleViewWithViews(this, dtMsD, tempComponents)
-		input.endFrame(dtMs)
+		input.startFrame(time)
+		stage.updateSingleView(time, tempComponents)
+		stage.updateSingleViewWithViews(this, time, tempComponents)
+		input.endFrame(time)
 	}
 
 
@@ -239,8 +238,8 @@ class Views(
 
 		scaleMode(virtualSize, actualSize, targetSize)
 
-		val ratioX = targetSize.width.toDouble() / virtualWidth.toDouble()
-		val ratioY = targetSize.height.toDouble() / virtualHeight.toDouble()
+		val ratioX = targetSize.width.toFloat() / virtualWidth.toFloat()
+		val ratioY = targetSize.height.toFloat() / virtualHeight.toFloat()
 
 		actualVirtualWidth = (actualSize.width / ratioX).toInt()
 		actualVirtualHeight = (actualSize.height / ratioY).toInt()
@@ -248,8 +247,8 @@ class Views(
 		stage.scaleX = ratioX
 		stage.scaleY = ratioY
 
-		stage.x = (((actualVirtualWidth - virtualWidth) * anchor.sx) * ratioX).toInt().toDouble()
-		stage.y = (((actualVirtualHeight - virtualHeight) * anchor.sy) * ratioY).toInt().toDouble()
+		stage.x = (((actualVirtualWidth - virtualWidth) * anchor.sx) * ratioX).toInt().toFloat()
+		stage.y = (((actualVirtualHeight - virtualHeight) * anchor.sy) * ratioY).toInt().toFloat()
 
 		actualVirtualLeft = -(stage.x / ratioX).toInt()
 		actualVirtualTop = -(stage.y / ratioY).toInt()
@@ -277,7 +276,7 @@ class Stage(val views: Views) : Container(), View.Reference, CoroutineScope by v
 		out.setTo(views.actualVirtualLeft, views.actualVirtualTop, views.actualVirtualWidth, views.actualVirtualHeight)
 	}
 
-	override fun hitTest(x: Double, y: Double): View? = super.hitTest(x, y) ?: this
+	override fun hitTest(x: Float, y: Float): View? = super.hitTest(x, y) ?: this
 
 	override fun renderInternal(ctx: RenderContext) {
 		if (views.clipBorders) {
@@ -368,15 +367,15 @@ fun appendComponents(view: View, out: ArrayList<Component>) {
 	if (components != null) out.addAll(components)
 }
 
-fun View.updateSingleView(dtMsD: Double, tempComponents: ArrayList<Component> = arrayListOf()) {
+fun View.updateSingleView(edlta: TimeSpan, tempComponents: ArrayList<Component> = arrayListOf()) {
 	this.forEachComponent<UpdateComponent>(tempComponents) {
-		it.update(dtMsD * it.view.globalSpeed)
+		it.update(edlta * it.view.globalSpeed.toDouble())
 	}
 }
 
-fun View.updateSingleViewWithViews(views: Views, dtMsD: Double, tempComponents: ArrayList<Component> = arrayListOf()) {
+fun View.updateSingleViewWithViews(views: Views, delta: TimeSpan, tempComponents: ArrayList<Component> = arrayListOf()) {
 	this.forEachComponent<UpdateComponentWithViews>(tempComponents) {
-		it.update(views, dtMsD * it.view.globalSpeed)
+		it.update(views, delta * it.view.globalSpeed.toDouble())
 	}
 }
 

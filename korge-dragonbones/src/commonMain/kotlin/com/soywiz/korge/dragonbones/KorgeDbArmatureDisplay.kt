@@ -32,7 +32,8 @@ import com.dragonbones.util.*
 import com.soywiz.korge.view.*
 import com.soywiz.korim.bitmap.*
 import com.soywiz.korim.color.*
-import com.soywiz.korma.*
+import com.soywiz.korma.geom.vector.*
+
 
 /**
  * @inheritDoc
@@ -62,7 +63,7 @@ class KorgeDbArmatureDisplay : Container(), IArmatureProxy {
 		addUpdatable {
 			returnEvents()
 			//_armature?.advanceTimeForChildren(it.toDouble() / 1000.0)
-			_armature?.advanceTime(it.toDouble() / 1000.0)
+			_armature?.advanceTime(it.seconds.toFloat())
 			dispatchQueuedEvents()
 		}
 	}
@@ -110,12 +111,12 @@ class KorgeDbArmatureDisplay : Container(), IArmatureProxy {
 					val endX = startX + bone.globalTransformMatrix.a * boneLength
 					val endY = startY + bone.globalTransformMatrix.b * boneLength
 
-					boneDrawer.lineStyle(2.0, Colors.PURPLE, 0.7)
+					boneDrawer.lineStyle(2.0, Colors.PURPLE, 0.7f)
 					boneDrawer.moveTo(startX.toDouble(), startY.toDouble())
 					boneDrawer.lineTo(endX, endY)
-					boneDrawer.lineStyle(0.0, Colors.BLACK, 0.0)
-					boneDrawer.beginFill(Colors.PURPLE, 0.7)
-					boneDrawer.drawCircle(startX.toDouble(), startY.toDouble(), 3.0)
+					boneDrawer.lineStyle(0.0, Colors.BLACK, 0.0f)
+					boneDrawer.beginFill(Colors.PURPLE, 0.7f)
+					boneDrawer.circle(startX.toDouble(), startY.toDouble(), 3.0)
 					boneDrawer.endFill()
 				}
 
@@ -134,11 +135,11 @@ class KorgeDbArmatureDisplay : Container(), IArmatureProxy {
 						}
 
 						child.clear()
-						child.lineStyle(2.0, Colors.RED, 0.7)
+						child.lineStyle(2.0, Colors.RED, 0.7f)
 
 						when (boundingBoxData.type) {
 							BoundingBoxType.Rectangle -> {
-								child.drawRect(
+								child.rect(
 									-boundingBoxData.width * 0.5,
 									-boundingBoxData.height * 0.5,
 									boundingBoxData.width,
@@ -147,7 +148,7 @@ class KorgeDbArmatureDisplay : Container(), IArmatureProxy {
 							}
 
 							BoundingBoxType.Ellipse -> {
-								child.drawEllipse(
+								child.ellipse(
 									-boundingBoxData.width * 0.5,
 									-boundingBoxData.height * 0.5,
 									boundingBoxData.width,
@@ -182,8 +183,9 @@ class KorgeDbArmatureDisplay : Container(), IArmatureProxy {
 						slot.updateGlobalTransform()
 
 						val transform = slot.global
-						val m = Matrix2d()
-						slot.globalTransformMatrix.toMatrix2d(m)
+						val m = com.soywiz.korma.geom.Matrix()
+						//val m = Matrix()
+						slot.globalTransformMatrix.toKormaMatrix(m)
 						//println("SET TRANSFORM: $transform")
 						child.setMatrix(m)
 					} else {

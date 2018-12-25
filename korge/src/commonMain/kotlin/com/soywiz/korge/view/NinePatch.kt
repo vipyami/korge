@@ -6,36 +6,36 @@ import com.soywiz.korma.geom.*
 import kotlin.math.*
 
 inline fun Container.ninePatch(
-	tex: BmpSlice, width: Double, height: Double, left: Double, top: Double, right: Double, bottom: Double,
+	tex: BmpSlice, width: Number, height: Number, left: Number, top: Number, right: Number, bottom: Number,
 	callback: @ViewsDslMarker NinePatch.() -> Unit
-) = NinePatch(tex, width, height, left, top, right, bottom).addTo(this).apply(callback)
+) = NinePatch(tex, width.toFloat(), height.toFloat(), left.toFloat(), top.toFloat(), right.toFloat(), bottom.toFloat()).addTo(this).apply(callback)
 
 class NinePatch(
 	var tex: BmpSlice,
-	override var width: Double,
-	override var height: Double,
-	var left: Double,
-	var top: Double,
-	var right: Double,
-	var bottom: Double
+	override var width: Float,
+	override var height: Float,
+	var left: Float,
+	var top: Float,
+	var right: Float,
+	var bottom: Float
 ) : View() {
 	var smoothing = true
 
-	private val sLeft = 0.0
-	private val sTop = 0.0
+	private val sLeft = 0f
+	private val sTop = 0f
 
 	val posCuts = arrayOf(
-		MPoint2d(0, 0),
-		MPoint2d(left, top),
-		MPoint2d(1.0 - right, 1.0 - bottom),
-		MPoint2d(1.0, 1.0)
+		Point(0, 0),
+		Point(left, top),
+		Point(1.0 - right, 1.0 - bottom),
+		Point(1.0, 1.0)
 	)
 
 	val texCuts = arrayOf(
-		MPoint2d(0, 0),
-		MPoint2d(left, top),
-		MPoint2d(1.0 - right, 1.0 - bottom),
-		MPoint2d(1.0, 1.0)
+		Point(0, 0),
+		Point(left, top),
+		Point(1.0 - right, 1.0 - bottom),
+		Point(1.0, 1.0)
 	)
 
 	override fun renderInternal(ctx: RenderContext) {
@@ -50,8 +50,8 @@ class NinePatch(
 		val texRighttWidth = tex.width * right
 		val texBottomHeight = tex.height * bottom
 
-		val ratioX = if (width < tex.width) width / tex.width else 1.0
-		val ratioY = if (height < tex.height) height / tex.height else 1.0
+		val ratioX = if (width < tex.width) width / tex.width else 1f
+		val ratioY = if (height < tex.height) height / tex.height else 1f
 
 		val actualRatioX = min(ratioX, ratioY)
 		val actualRatioY = min(ratioX, ratioY)
@@ -80,7 +80,7 @@ class NinePatch(
 		out.setTo(sLeft, sTop, width, height)
 	}
 
-	override fun hitTest(x: Double, y: Double): View? {
+	override fun hitTest(x: Float, y: Float): View? {
 		val sRight = sLeft + width
 		val sBottom = sTop + height
 		return if (checkGlobalBounds(x, y, sLeft, sTop, sRight, sBottom)) this else null

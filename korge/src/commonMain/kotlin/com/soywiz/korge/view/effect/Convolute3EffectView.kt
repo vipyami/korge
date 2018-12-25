@@ -3,39 +3,40 @@ package com.soywiz.korge.view.effect
 import com.soywiz.korag.*
 import com.soywiz.korag.shader.*
 import com.soywiz.korge.view.*
-import com.soywiz.korma.*
+import com.soywiz.korma.geom.*
+
 
 /**
  * https://en.wikipedia.org/wiki/Kernel_(image_processing)
  */
-class Convolute3EffectView(val kernel: Matrix3) : EffectView() {
+class Convolute3EffectView(val kernel: Matrix3D) : EffectView() {
 	companion object {
 		private val u_Weights = Uniform("weights", VarType.Mat3)
 
 
-		val KERNEL_GAUSSIAN_BLUR: Matrix3
-			get() = Matrix3(
+		val KERNEL_GAUSSIAN_BLUR: Matrix3D
+			get() = Matrix3D(
 				1f, 2f, 1f,
 				2f, 4f, 2f,
 				1f, 2f, 1f
 			) * (1f / 16f)
 
-		val KERNEL_BOX_BLUR: Matrix3
-			get() = Matrix3(
+		val KERNEL_BOX_BLUR: Matrix3D
+			get() = Matrix3D(
 				1f, 1f, 1f,
 				1f, 1f, 1f,
 				1f, 1f, 1f
 			) * (1f / 9f)
 
-		val KERNEL_IDENTITY: Matrix3
-			get() = Matrix3(
+		val KERNEL_IDENTITY: Matrix3D
+			get() = Matrix3D(
 				0f, 0f, 0f,
 				0f, 1f, 0f,
 				0f, 0f, 0f
 			)
 
-		val KERNEL_EDGE_DETECTION: Matrix3
-			get() = Matrix3(
+		val KERNEL_EDGE_DETECTION: Matrix3D
+			get() = Matrix3D(
 				-1f, -1f, -1f,
 				-1f, +8f, -1f,
 				-1f, -1f, -1f
@@ -62,7 +63,7 @@ class Convolute3EffectView(val kernel: Matrix3) : EffectView() {
 }
 
 inline fun Container.convolute3EffectView(
-	kernel: Matrix3 = Matrix3(),
+	kernel: Matrix3D = Matrix3D(),
 	callback: @ViewsDslMarker Convolute3EffectView.() -> Unit = {}
 ) =
 	Convolute3EffectView(kernel).addTo(this).apply(callback)

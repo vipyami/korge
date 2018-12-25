@@ -1,6 +1,7 @@
 package com.soywiz.korge.animate
 
 import com.soywiz.kds.*
+import com.soywiz.klock.*
 import com.soywiz.korau.format.*
 import com.soywiz.korau.sound.*
 import com.soywiz.korge.animate.serialization.*
@@ -8,10 +9,12 @@ import com.soywiz.korge.render.*
 import com.soywiz.korge.view.*
 import com.soywiz.korim.bitmap.*
 import com.soywiz.korim.color.*
+import com.soywiz.korim.color.RGBA.Companion.interpolate
 import com.soywiz.korio.error.*
 import com.soywiz.korio.util.*
-import com.soywiz.korma.*
+
 import com.soywiz.korma.geom.*
+import com.soywiz.korma.geom.vector.*
 import com.soywiz.korma.interpolation.*
 import kotlin.collections.set
 
@@ -83,25 +86,25 @@ data class AnSymbolTimelineFrame(
 	var depth: Int = -1,
 	var uid: Int = -1,
 	var clipDepth: Int = -1,
-	var ratio: Double = 0.0,
-	var transform: Matrix2d = Matrix2d(),
+	var ratio: Float = 0f,
+	var transform: Matrix = Matrix(),
 	var name: String? = null,
 	var colorTransform: ColorTransform = ColorTransform(),
 	var blendMode: BlendMode = BlendMode.INHERIT
 ) {
-	fun setToInterpolated(l: AnSymbolTimelineFrame, r: AnSymbolTimelineFrame, ratio: Double) {
-		this.transform.setToInterpolated(ratio, l.transform, r.transform)
+	fun setToInterpolated(l: AnSymbolTimelineFrame, r: AnSymbolTimelineFrame, ratio: Float) {
+		this.transform.setToInterpolated(l.transform, r.transform, ratio)
 		this.colorTransform.setToInterpolated(l.colorTransform, r.colorTransform, ratio)
-		this.ratio = interpolate(l.ratio, r.ratio, ratio)
+		this.ratio = ratio.interpolate(l.ratio, r.ratio)
 		this.name = l.name
 		this.blendMode = l.blendMode
 	}
 
 	companion object {
-		fun setToViewInterpolated(view: View, l: AnSymbolTimelineFrame, r: AnSymbolTimelineFrame, ratio: Double) {
+		fun setToViewInterpolated(view: View, l: AnSymbolTimelineFrame, r: AnSymbolTimelineFrame, ratio: Float) {
 			view.setMatrixInterpolated(ratio, l.transform, r.transform)
 			view.colorTransform = view.colorTransform.setToInterpolated(l.colorTransform, r.colorTransform, ratio)
-			view.ratio = interpolate(l.ratio, r.ratio, ratio)
+			view.ratio = ratio.interpolate(l.ratio, r.ratio)
 			view.name = l.name
 			view.blendMode = l.blendMode
 		}
@@ -247,7 +250,7 @@ class AnSymbolUidDef(val characterId: Int, val extraProps: MutableMap<String, St
 
 class AnSymbolMovieClipSubTimeline(totalDepths: Int) {
 	//var name: String = "default"
-	var totalTime: Int = 0
+	var totalTime: TimeSpan = 0.seconds
 
 	//val totalTimeSeconds: Double get() = totalTime / 1_000_000.0
 	//val totalTimeSeconds: Double get() = 100.0
@@ -259,7 +262,7 @@ class AnSymbolMovieClipSubTimeline(totalDepths: Int) {
 	var nextStatePlay: Boolean = false
 }
 
-class AnSymbolMovieClipState(val name: String, val subTimeline: AnSymbolMovieClipSubTimeline, val startTime: Int)
+class AnSymbolMovieClipState(val name: String, val subTimeline: AnSymbolMovieClipSubTimeline, val startTime: TimeSpan)
 
 class AnSymbolMovieClip(id: Int, name: String?, val limits: AnSymbolLimits) : AnSymbol(id, name) {
 	var ninePatch: Rectangle? = null

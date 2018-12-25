@@ -2,6 +2,7 @@ package com.soywiz.korge.ext.swf
 
 import com.codeazur.as3swf.*
 import com.soywiz.kds.*
+import com.soywiz.klock.*
 import com.soywiz.kmem.*
 import com.soywiz.korfl.*
 import com.soywiz.korge.animate.*
@@ -16,23 +17,22 @@ import com.soywiz.korio.error.*
 import com.soywiz.korio.lang.*
 import com.soywiz.korio.serialization.json.*
 import com.soywiz.korio.stream.*
-import com.soywiz.korio.util.*
-import com.soywiz.korma.*
+
 import com.soywiz.korma.geom.*
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
 import kotlin.math.*
 
-data class MinMaxDouble(
+data class MinMaxFloat(
 	var count: Int = 0,
-	var min: Double = 0.0,
-	var max: Double = 0.0
+	var min: Float = 0f,
+	var max: Float = 0f
 ) {
 	val isEmpty: Boolean get() = count == 0
 	val isNotEmpty: Boolean get() = count > 0
 
-	fun register(value: Double) {
+	fun register(value: Float) {
 		if (isEmpty) {
 			min = value
 			max = value
@@ -43,7 +43,7 @@ data class MinMaxDouble(
 		count++
 	}
 
-	fun register(value: MinMaxDouble) {
+	fun register(value: MinMaxFloat) {
 		if (value.isNotEmpty) {
 			register(value.min)
 			register(value.max)
@@ -54,15 +54,15 @@ data class MinMaxDouble(
 class SymbolAnalyzeInfo(val characterId: Int) {
 	var hasNinePatch = false
 	val parents = LinkedHashSet<SymbolAnalyzeInfo>()
-	val scaleBounds = MinMaxDouble()
+	val scaleBounds = MinMaxFloat()
 
-	val globalScaleBounds: MinMaxDouble by lazy {
-		val out = MinMaxDouble()
+	val globalScaleBounds: MinMaxFloat by lazy {
+		val out = MinMaxFloat()
 		if (parents.isEmpty()) {
 			if (scaleBounds.isNotEmpty) {
 				out.register(scaleBounds)
 			} else {
-				out.register(1.0)
+				out.register(1f)
 			}
 		} else {
 			for (parent in parents) {
@@ -78,11 +78,11 @@ class SymbolAnalyzeInfo(val characterId: Int) {
 		parents += characterId
 	}
 
-	fun registerScale(scaleX: Double, scaleY: Double) {
+	fun registerScale(scaleX: Float, scaleY: Float) {
 		scaleBounds.register(max(scaleX, scaleY))
 	}
 
-	fun registerMatrix(matrix: Matrix2d) {
+	fun registerMatrix(matrix: Matrix) {
 		registerScale(abs(matrix.a), abs(matrix.d))
 	}
 }
@@ -95,8 +95,8 @@ class SWFShapeRasterizerRequest(
 	val config: SWFExportConfig
 ) {
 	val path = GraphicsPath()
-	fun getRasterizer(maxScale: Double): SWFShapeRasterizer {
-		val adaptiveScaling = if (config.adaptiveScaling) maxScale else 1.0
+	fun getRasterizer(maxScale: Float): SWFShapeRasterizer {
+		val adaptiveScaling = if (config.adaptiveScaling) maxScale else 1f
 		//val maxScale = if (maxScale != 0.0) 1.0 / maxScale else 1.0
 		//println("SWFShapeRasterizerRequest: $charId: $adaptiveScaling : $config")
 		return SWFShapeRasterizer(
@@ -122,7 +122,7 @@ class SwfLoaderMethod(val views: Views, val config: SWFExportConfig) {
 	val classNameToTagId = hashMapOf<String, Int>()
 	val shapesToPopulate = LinkedHashMap<AnSymbolShape, SWFShapeRasterizerRequest>()
 	val morphShapesToPopulate = arrayListOf<AnSymbolMorphShape>()
-	val morphShapeRatios = hashMapOf<Int, HashSet<Double>>()
+	val morphShapeRatios = hashMapOf<Int, HashSet<Float>>()
 
 	private val analyzerInfos = hashMapOf<Int, SymbolAnalyzeInfo>()
 
@@ -151,7 +151,7 @@ class SwfLoaderMethod(val views: Views, val config: SWFExportConfig) {
 		}
 	}
 
-	fun getFrameTime(index0: Int) = (index0 * lib.msPerFrameDouble).toInt() * 1000
+	fun getFrameTime(index0: Int) = (index0 * lib.msPerFrameDouble).toInt().milliseconds
 
 	suspend private fun generateActualTimelines() {
 		for (symbol in lib.symbolsById.filterIsInstance<AnSymbolMovieClip>()) {
@@ -169,7 +169,7 @@ class SwfLoaderMethod(val views: Views, val config: SWFExportConfig) {
 			) {
 				//val totalTime get() = getFrameTime(totalFrames - 1)
 				//val totalTime get() = getFrameTime(totalFrames)
-				val totalTime get() = getFrameTime(totalFrames)
+				val totalTime: TimeSpan get() = getFrameTime(totalFrames)
 			}
 
 			data class FrameInfo(
@@ -179,7 +179,7 @@ class SwfLoaderMethod(val views: Views, val config: SWFExportConfig) {
 				val startSubtimeline: Boolean,
 				val startNamedState: Boolean
 			) {
-				val timeInSubTimeline = getFrameTime(frameInSubTimeline)
+				val timeInSubTimeline: TimeSpan = getFrameTime(frameInSubTimeline)
 			}
 
 			val frameInfos = ArrayList<FrameInfo>(swfTimeline.frames.size)
@@ -286,8 +286,8 @@ class SwfLoaderMethod(val views: Views, val config: SWFExportConfig) {
 
 					//println("currentSubTimeline.totalTime = info.subtimeline.totalTime <- ${info.subtimeline.totalTime}")
 					if (frame.isFirst) {
-						symbol.states["default"] = AnSymbolMovieClipState("default", currentSubTimeline, 0)
-						symbol.states["frame0"] = AnSymbolMovieClipState("frame0", currentSubTimeline, 0)
+						symbol.states["default"] = AnSymbolMovieClipState("default", currentSubTimeline, 0.seconds)
+						symbol.states["frame0"] = AnSymbolMovieClipState("frame0", currentSubTimeline, 0.seconds)
 					}
 				}
 				// States
@@ -426,10 +426,10 @@ class SwfLoaderMethod(val views: Views, val config: SWFExportConfig) {
 
 		for (morph in morphShapesToPopulate) {
 			val tag = morph.tagDefineMorphShape!!
-			val ratios = (morphShapeRatios[tag.characterId] ?: setOf<Double>()).sorted()
+			val ratios = (morphShapeRatios[tag.characterId] ?: setOf<Float>()).sorted()
 			val MAX_RATIOS = 24
 			val aratios =
-				if (ratios.size > MAX_RATIOS) (0 until MAX_RATIOS).map { it.toDouble() / (MAX_RATIOS - 1).toDouble() } else ratios
+				if (ratios.size > MAX_RATIOS) (0 until MAX_RATIOS).map { it.toFloat() / (MAX_RATIOS - 1).toFloat() } else ratios
 			for (ratio in aratios) {
 				val bb = ShapeExporterBoundsBuilder()
 				try {
@@ -455,7 +455,7 @@ class SwfLoaderMethod(val views: Views, val config: SWFExportConfig) {
 					maxSide = config.maxMorphShapeSide
 				)
 				itemsInAtlas.put(
-					{ texture -> morph.texturesWithBitmap.add((ratio * 1000).toInt(), texture) },
+					{ texture -> morph.texturesWithBitmap.add(ratio.milliseconds, texture) },
 					rasterizer.imageWithScale
 				)
 			}
@@ -519,18 +519,18 @@ class SwfLoaderMethod(val views: Views, val config: SWFExportConfig) {
 			var clipDepth: Int = -1,
 			var name: String? = null,
 			var colorTransform: ColorTransform = ColorTransform.identity,
-			var ratio: Double = 0.0,
-			var matrix: Matrix2d = Matrix2d(),
+			var ratio: Float = 0f,
+			var matrix: Matrix = Matrix(),
 			var blendMode: BlendMode = BlendMode.INHERIT
 		) {
 			fun reset() {
 				uid = -1
-				ratio = 0.0
+				ratio = 0f
 				charId = -1
 				clipDepth = -1
 				colorTransform = ColorTransform.identity
 				name = null
-				matrix = Matrix2d()
+				matrix = Matrix()
 				blendMode = BlendMode.INHERIT
 			}
 
@@ -816,9 +816,9 @@ class SwfLoaderMethod(val views: Views, val config: SWFExportConfig) {
 					}
 
 					if (it.hasRatio) {
-						depth.ratio = it.ratiod
+						depth.ratio = it.ratiof
 						val ratios = morphShapeRatios.getOrPut(depth.charId) { hashSetOf() }
-						ratios += it.ratiod
+						ratios += it.ratiof
 					}
 
 					analyzerInfo(depth.charId).registerParent(analyzerInfo(mc.id))

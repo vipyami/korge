@@ -4,18 +4,19 @@ import com.soywiz.kds.*
 import com.soywiz.klogger.*
 import com.soywiz.korag.*
 import com.soywiz.korim.color.*
-import com.soywiz.korma.*
+import com.soywiz.korma.geom.*
+
 
 private val logger = Logger("RenderContext2D")
 
 class RenderContext2D(val batch: BatchBuilder2D) : Extra by Extra.Mixin() {
 	init { logger.trace { "RenderContext2D[0]" } }
 
-	val mpool = Pool<Matrix2d> { Matrix2d() }
+	val mpool = Pool<Matrix> { Matrix() }
 
 	init { logger.trace { "RenderContext2D[1]" } }
 
-	val m = Matrix2d()
+	val m = Matrix()
 	var blendFactors = AG.Blending.NORMAL
 	var multiplyColor = Colors.WHITE
 
@@ -58,34 +59,30 @@ class RenderContext2D(val batch: BatchBuilder2D) : Extra by Extra.Mixin() {
 		}
 	}
 
-	fun setMatrix(matrix: Matrix2d) {
+	fun setMatrix(matrix: Matrix) {
 		this.m.copyFrom(matrix)
 	}
 
-	fun translate(dx: Double, dy: Double) {
+	fun translate(dx: Float, dy: Float) {
 		m.pretranslate(dx, dy)
 	}
 
-	fun scale(sx: Double, sy: Double = sx) {
+	fun scale(sx: Float, sy: Float = sx) {
 		m.prescale(sx, sy)
 	}
 
-	fun scale(scale: Double) {
+	fun scale(scale: Float) {
 		m.prescale(scale, scale)
 	}
 
-	fun rotate(angle: Double) {
+	fun rotate(angle: Float) {
 		m.prerotate(angle)
 	}
 
-	fun imageScale(texture: Texture, x: Double, y: Double, scale: Double) {
+	fun imageScale(texture: Texture, x: Float, y: Float, scale: Float) {
 		//println(m)
 		batch.drawQuad(
-			texture,
-			x.toFloat(),
-			y.toFloat(),
-			(texture.width * scale).toFloat(),
-			(texture.height * scale).toFloat(),
+			texture, x, y, (texture.width * scale), (texture.height * scale),
 			m = m,
 			colorMulInt = multiplyColor.rgba,
 			blendFactors = blendFactors

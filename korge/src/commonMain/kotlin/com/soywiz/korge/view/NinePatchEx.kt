@@ -6,18 +6,18 @@ import com.soywiz.korim.bitmap.*
 import com.soywiz.korma.geom.*
 
 inline fun Container.ninePatch(
-	tex: NinePatchEx.Tex, width: Double, height: Double, callback: @ViewsDslMarker NinePatchEx.() -> Unit
-) = NinePatchEx(tex, width, height).addTo(this).apply(callback)
+	tex: NinePatchEx.Tex, width: Number, height: Number, callback: @ViewsDslMarker NinePatchEx.() -> Unit
+) = NinePatchEx(tex, width.toFloat(), height.toFloat()).addTo(this).apply(callback)
 
 inline fun Container.ninePatch(
-	ninePatch: NinePatchBitmap32, width: Double = ninePatch.dwidth, height: Double = ninePatch.dheight,
+	ninePatch: NinePatchBitmap32, width: Number = ninePatch.dwidth, height: Number = ninePatch.dheight,
 	callback: @ViewsDslMarker NinePatchEx.() -> Unit
-) = NinePatchEx(ninePatch, width, height).addTo(this).apply(callback)
+) = NinePatchEx(ninePatch, width.toFloat(), height.toFloat()).addTo(this).apply(callback)
 
 class NinePatchEx(
 	val ninePatch: Tex,
-	override var width: Double,
-	override var height: Double
+	override var width: Float,
+	override var height: Float
 ) : View() {
 	var smoothing = true
 
@@ -26,7 +26,7 @@ class NinePatchEx(
 	companion object {
 		operator fun invoke(
 			ninePatch: NinePatchBitmap32,
-			width: Double = ninePatch.width.toDouble(), height: Double = ninePatch.height.toDouble()
+			width: Float = ninePatch.width.toFloat(), height: Float = ninePatch.height.toFloat()
 		): NinePatchEx = NinePatchEx(Tex(ninePatch), width, height)
 	}
 

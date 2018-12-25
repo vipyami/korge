@@ -9,7 +9,7 @@ import com.soywiz.korge.view.*
 class JellyButton(val view: View?, var targetScale: Double = 1.5) {
 	val hitTest = view["hitTest"] ?: view
 	val content = view["content"] ?: view
-	val initialScale = content?.scale ?: 1.0
+	val initialScale = content?.scale ?: 1.0f
 	var down = false
 	var over = false
 
@@ -17,7 +17,7 @@ class JellyButton(val view: View?, var targetScale: Double = 1.5) {
 
 	init {
 		if (hitTest != content) {
-			hitTest?.alpha = 0.0
+			hitTest?.alpha = 0.0f
 		}
 		//println("----------------")
 		//println(hitTest?.globalBounds)

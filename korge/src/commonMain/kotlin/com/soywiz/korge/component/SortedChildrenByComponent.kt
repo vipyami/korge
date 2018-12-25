@@ -1,10 +1,11 @@
 package com.soywiz.korge.component.docking
 
+import com.soywiz.klock.*
 import com.soywiz.korge.component.*
 import com.soywiz.korge.view.*
 
 class SortedChildrenByComponent(override val view: Container, var comparator: Comparator<View>) : UpdateComponent {
-	override fun update(ms: Double) {
+	override fun update(time: TimeSpan) {
 		view.sortChildrenBy(comparator)
 	}
 }

@@ -1,5 +1,6 @@
 package com.soywiz.korge.component
 
+import com.soywiz.klock.*
 import com.soywiz.korge.view.*
 import com.soywiz.korui.event.*
 import com.soywiz.korui.input.*
@@ -36,11 +37,11 @@ interface EventComponent : Component {
 }
 
 interface UpdateComponentWithViews : Component {
-	fun update(views: Views, ms: Double)
+	fun update(views: Views, time: TimeSpan)
 }
 
 interface UpdateComponent : Component {
-	fun update(ms: Double)
+	fun update(time: TimeSpan)
 }
 
 interface ResizeComponent : Component {

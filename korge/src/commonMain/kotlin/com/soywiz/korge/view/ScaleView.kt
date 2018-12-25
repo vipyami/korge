@@ -3,15 +3,13 @@ package com.soywiz.korge.view
 import com.soywiz.korge.render.*
 
 inline fun Container.scaleView(
-	width: Int, height: Int, scale: Double = 2.0, filtering: Boolean = false,
+	width: Number, height: Number, scale: Number = 2f, filtering: Boolean = false,
 	callback: @ViewsDslMarker Container.() -> Unit = {}
-) = ScaleView(width, height, scale, filtering).addTo(this).apply(callback)
+) = ScaleView(width.toFloat(), height.toFloat(), scale.toFloat(), filtering).addTo(this).apply(callback)
 
-class ScaleView(width: Int, height: Int, scale: Double = 2.0, var filtering: Boolean = false) :
-	FixedSizeContainer(), View.Reference {
+class ScaleView(width: Float, height: Float, scale: Float = 2f, var filtering: Boolean = false) :
+	FixedSizeContainer(width, height), View.Reference {
 	init {
-		this.width = width.toDouble()
-		this.height = height.toDouble()
 		this.scale = scale
 	}
 

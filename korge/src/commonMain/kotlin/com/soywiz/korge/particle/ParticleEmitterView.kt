@@ -7,11 +7,11 @@ import com.soywiz.korio.util.*
 import com.soywiz.korma.geom.*
 
 inline fun Container.particleEmitter(
-	emitter: ParticleEmitter, emitterPos: Point2d = Point2d(),
+	emitter: ParticleEmitter, emitterPos: Point = Point(),
 	callback: @ViewsDslMarker ParticleEmitterView.() -> Unit = {}
 ) = ParticleEmitterView(emitter, emitterPos).addTo(this).apply(callback)
 
-class ParticleEmitterView(val emitter: ParticleEmitter, emitterPos: Point2d = Point2d()) : View() {
+class ParticleEmitterView(val emitter: ParticleEmitter, emitterPos: Point = Point()) : View() {
 	val simulator = ParticleEmitter.Simulator(emitter, emitterPos)
 
 	var timeUntilStop by simulator::timeUntilStop.redirect()
@@ -21,8 +21,8 @@ class ParticleEmitterView(val emitter: ParticleEmitter, emitterPos: Point2d = Po
 	val anyAlive by simulator::anyAlive.redirect()
 
 	init {
-		addUpdatable { dtMs ->
-			simulator.simulate(dtMs.toDouble() / 1000.0)
+		addUpdatable { time ->
+			simulator.simulate(time)
 		}
 	}
 
@@ -37,8 +37,8 @@ class ParticleEmitterView(val emitter: ParticleEmitter, emitterPos: Point2d = Po
 
 		val context = ctx.ctx2d
 		val texture = emitter.texture ?: return
-		val cx = texture.width * 0.5
-		val cy = texture.height * 0.5
+		val cx = texture.width * 0.5f
+		val cy = texture.height * 0.5f
 		context.keep {
 			context.blendFactors = emitter.blendFactors
 			context.setMatrix(globalMatrix)
