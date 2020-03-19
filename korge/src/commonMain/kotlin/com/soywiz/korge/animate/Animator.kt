@@ -122,8 +122,9 @@ open class Animator(
             override suspend fun execute() = executeImmediately()
             override fun executeImmediately() {
                 val block = sequence { callback() }
-                // @TODO: Optimize this at KDS
-                for (node in block.nodes.reversed()) nodes.addFirst(node)
+                for (n in 0 until block.nodes.size) {
+                    nodes.addFirst(block.nodes[block.nodes.size - n - 1])
+                }
             }
         })
     }
