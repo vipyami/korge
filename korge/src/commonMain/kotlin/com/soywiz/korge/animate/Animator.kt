@@ -117,10 +117,14 @@ open class Animator(
     fun wait(time: TimeSpan = this.time) = __tween(time = time)
     fun wait(time: () -> TimeSpan) = __tween(lazyTime = time)
 
-    fun block(callback: () -> Unit) {
+    fun block(callback: Animator.() -> Unit) {
         nodes.add(object : BaseAnimatorNode {
-            override suspend fun execute() = callback()
-            override fun executeImmediately() = callback()
+            override suspend fun execute() = executeImmediately()
+            override fun executeImmediately() {
+                val block = sequence { callback() }
+                // @TODO: Optimize this at KDS
+                for (node in block.nodes.reversed()) nodes.addFirst(node)
+            }
         })
     }
 }
