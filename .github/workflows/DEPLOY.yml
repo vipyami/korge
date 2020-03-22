@@ -26,7 +26,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - run: ./gradlew
-      - run: ./gradlew assemble check publish -x jsBrowserTest
+      - run: ./gradlew assemble check publish -x publishKotlinMultiplatformPublicationToMavenRepository -x jsBrowserTest
 
   publish-linux:
     runs-on: ubuntu-latest
@@ -40,4 +40,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - run: ./gradlew publishKotlinMultiplatformPublicationToMavenRepository publishMetadataPublicationToMavenRepository actuallyPublishBintray
+      - run: ./gradlew publishKotlinMultiplatformPublicationToMavenRepository actuallyPublishBintray
