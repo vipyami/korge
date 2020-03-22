@@ -33,11 +33,11 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - run: ./gradlew
-      - run: ./gradlew assemble check lint testDebugUnitTest publishLinuxX64PublicationToMavenRepository -x jsBrowserTest
+      - run: ./gradlew assemble check lint testDebugUnitTest publishKotlinMultiplatformPublicationToMavenRepository publishLinuxX64PublicationToMavenRepository -x jsBrowserTest
 
   publish-finalize:
     needs: [publish-windows, publish-mac, publish-linux]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - run: ./gradlew publishKotlinMultiplatformPublicationToMavenRepository actuallyPublishBintray
+      - run: ./gradlew actuallyPublishBintray
